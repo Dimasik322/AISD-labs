@@ -11,14 +11,14 @@ int main() {
 	//auto v1 = Vector(list1, 2);
 	//auto v2 = Vector(list2, 2);
 
-	complex<int> list[]{complex(1, 2), complex(1, 2)};
-	complex<int> lsit[]{complex(0, 1), complex(3, 1) };
+	complex<int> list[]{complex(3, 1), complex(1, 2)};
+	complex<int> lsit[]{complex(2, 1), complex(0, 1) };
 	auto v1 = Vector<complex<int>>(list, 2);
 	auto v2 = Vector<complex<int>>(lsit, 2);
-	cout << v1 << endl;
-	cout << v2 << endl;
-	v1 *= 3;
-	cout << v1;
+	//cout << v1 << endl;
+	//cout << v2 << endl;
+	//v1 *= 3;
+	cout << v1.abs();
 	//auto v4 = Vector<float>(v3);
 	//cout << v4.abs();
 	//cout << v3.get_size() << " items:" << endl;;

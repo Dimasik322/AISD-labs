@@ -56,6 +56,7 @@ public:
 		}
 		return pow(abs, 0.5);
 	}
+
 	T& operator[](const int i) {
 		if (i < 0 || i >= size) {
 			cout << "Index out of range" << endl;
@@ -102,11 +103,11 @@ public:
 		}
 		return *this;
 	}
-	double operator*(const Vector& rhs) {
-		double sum = 0;
+	T operator*(const Vector& rhs) {
+		T sum = 0;
 		if (size == rhs.size) {
 			for (int i(0); i < size; i++) {
-				sum += double(axes[i]) * double(rhs.axes[i]);
+				sum += axes[i] * rhs.axes[i];
 			}
 		}
 		return sum;
@@ -155,7 +156,6 @@ double cos(Vector<T>& a, Vector<T>& b) {
 	}
 	return ((a * b) / (double(a.abs()) * double(b.abs())));
 }
-
 template<typename T>
 Vector<T> bis(Vector<T> a, Vector<T> b) {
 	if (a.abs()==0 || b.abs()==0) {
@@ -179,7 +179,6 @@ Vector<T> operator*(const T lhs, Vector<T>& rhs) {
 	}
 	return tmp;
 }
-
 template<typename T>
 Vector<complex<T>> operator*(const T lhs, Vector<complex<T>>& rhs) {
 	auto tmp = Vector<complex<T>>(rhs);
@@ -188,7 +187,20 @@ Vector<complex<T>> operator*(const T lhs, Vector<complex<T>>& rhs) {
 	}
 	return tmp;
 }
-
+template<typename T>
+complex<T> operator*(Vector<complex<T>>& lhs, Vector<complex<T>>& rhs) {
+	complex<T> sum(0.0, 0.0);
+	if (lhs.get_size() == rhs.get_size()) {
+		complex<T> a;
+		complex<T> b;
+		for (int i(0); i < lhs.get_size(); i++) {
+			a = lhs[i];
+			b = complex<T>(rhs[i].real(), rhs[i].imag() * (-1));
+			sum += a * b;
+		}
+	}
+	return sum;
+}
 template<typename T>
 std::ostream& operator<<(std::ostream& os, Vector<T> rhs)
 {
