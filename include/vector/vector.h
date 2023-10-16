@@ -14,40 +14,61 @@ private:
 	int size;
 
 public:
-	Vector() :axes(nullptr), size(0) {};
+	static inline float accurancy = 0.000001f;
+	Vector() {
+		int _size = 1 + rand() % 10;
+		cout << _size << endl;
+		size = _size;
+		axes = new T[size];
+		for (int i(0); i < size; ++i) {
+			axes[i] = rand();
+			cout << axes[i] << endl;
+		}
+	}
 	Vector(T* _list, int _size) {
-		if (_size < 0) {
-			cout << "The dimension of a verctor cannot be negative" << endl;
-			axes = nullptr;
-			size = 0;
+		if (_size <= 0) {
+			throw out_of_range("Size of vector cannot be negative or zero");
 		}
 		else {
-			axes = new T[_size];
-			size = _size;
-			for (int i(0); i < _size; i++) {
-				axes[i] = _list[i];
+			if (_list != nullptr) {
+				axes = new T[_size];
+				size = _size;
+				for (int i(0); i < _size; i++) {
+					axes[i] = _list[i];
+				}
+			}
+			else {
+				throw out_of_range("Nullptr instead of array ptr");
 			}
 		}
 	}
-	Vector(Vector& other) : axes(new T[other.size]), size(other.size) {
-		for (int i(0); i < size; i++) {
+	Vector(int _size) : size(_size), axes(new T[_size]) {}
+	Vector(const Vector& other) : axes(new T[other.size]), size(other.size) {
+		for (int i = 0; i < size; ++i) {
 			axes[i] = other.axes[i];
 		}
 	}
 	~Vector() {
 		delete[] axes;
 		axes = nullptr;
+		size = 0;
 	}
 
 	int get_size() {
 		return size;
 	}
-	void set_value(const int index, const T& value) {
-		for (int i(0); i < size; i++) {
-			if (i == index) {
-				axes[i] = value;
-			}
+	T* get_axes() {
+		return axes;
+	}
+	T& operator[](const int i) {
+		if (i < 0 || i >= size) {
+			throw out_of_range("Index out of size");
 		}
+		return axes[i];
+	}
+	void swap(Vector<T>& other) {
+		std::swap(this->axes, other.axes);
+		std::swap(this->size, other.size);
 	}
 	double abs() {
 		double abs = 0;
@@ -57,39 +78,51 @@ public:
 		return pow(abs, 0.5);
 	}
 
-	T& operator[](const int i) {
-		if (i < 0 || i >= size) {
-			cout << "Index out of range" << endl;
-			return axes[0];
-		}
-		return axes[i];
-	}
-	Vector& operator=(const Vector& rhs) {
-		if (this != &rhs) {
-			delete[] axes;
-			size = rhs.size;
-			axes = new T[size];
-			for (int i(0); i < size; i++) {
-				axes[i] = rhs.axes[i];
-			}
-		}
-		return *this;
-	}
-	Vector& operator+=(const Vector& rhs) {
+	Vector<T>& operator+=(const Vector& rhs) {
 		if (size == rhs.size) {
 			for (int i(0); i < size; i++) {
 				axes[i] += rhs.axes[i];
 			}
 		}
-		return *this;	
+		else {
+			throw out_of_range("Different sizes of vectors");
+		}
+		return *this;
 	}
-	Vector& operator-=(const Vector& rhs) {
+	Vector<T> operator+(Vector<T>& rhs) {
+		auto tmp = Vector<T>(*this);
+		if (size == rhs.size) {
+			for (int i(0); i < size; i++) {
+				tmp.axes[i] = axes[i] + rhs.axes[i];
+			}
+		}
+		else {
+			throw out_of_range("Different sizes of vectors");
+		}
+		return tmp;
+	}
+	Vector<T>& operator-=(const Vector& rhs) {
 		if (size == rhs.size) {
 			for (int i(0); i < size; i++) {
 				axes[i] -= rhs.axes[i];
 			}
 		}
+		else {
+			throw out_of_range("Different sizes of vectors");
+		}
 		return *this;
+	}
+	Vector<T> operator-(Vector<T>& rhs) {
+		auto tmp = Vector<T>(*this);
+		if (size == rhs.size) {
+			for (int i(0); i < size; i++) {
+				tmp.axes[i] = axes[i] - rhs.axes[i];
+			}
+		}
+		else {
+			throw out_of_range("Different sizes of vectors");
+		}
+		return tmp;
 	}
 	Vector& operator*=(const T& x) {
 		for (int i(0); i < size; i++) {
@@ -97,43 +130,35 @@ public:
 		}
 		return *this;
 	}
-	Vector& operator/=(const T& x) {
+	Vector<T> operator*(const T& x) {
+		auto tmp = Vector<T>(*this);
+		for (int i(0); i < size; i++) {
+			tmp.axes[i] = axes[i] * x;
+		}
+		return tmp;
+	}
+	Vector<T>& operator/=(const T& x) {
 		for (int i(0); i < size; i++) {
 			axes[i] /= x;
 		}
 		return *this;
 	}
-	T operator*(const Vector& rhs) {
-		T sum = 0;
-		if (size == rhs.size) {
-			for (int i(0); i < size; i++) {
-				sum += axes[i] * rhs.axes[i];
-			}
-		}
-		return sum;
-	}
-	Vector operator+(Vector<T>& rhs) {
+	Vector<T> operator/(const T& x) {
 		auto tmp = Vector<T>(*this);
-		if (size == rhs.size) {
-			for (int i(0); i < size; i++) {
-				tmp.axes[i] = axes[i] + rhs.axes[i];
-			}
+		for (int i(0); i < size; i++) {
+			tmp.axes[i] = axes[i] / x;
 		}
 		return tmp;
 	}
-	Vector operator-(Vector<T>& rhs) {
-		auto tmp = Vector<T>(*this);
-		if (size == rhs.size) {
-			for (int i(0); i < size; i++) {
-				tmp.axes[i] = axes[i] - rhs.axes[i];
-			}
-		}
-		return tmp;
+	Vector<T>& operator=(const Vector<T>& rhs) {
+		Vector<T> copy(rhs);
+		copy.swap(*this);
+		return *this;
 	}
 	bool operator==(Vector<T>& rhs) {
 		if (size == rhs.size) {
 			for (int i(0); i < size; ++i) {
-				if (axes[i] != rhs.axes[i]) {
+				if ((axes[i] - rhs.axes[i]) > accurancy) {
 					return false;
 				}
 			}
@@ -146,11 +171,42 @@ public:
 	bool operator!=(Vector<T>& rhs) {
 		return !((*this) == rhs);
 	}
+
+	T operator*(const Vector& rhs) {
+		T sum = 0;
+		if (size == rhs.size) {
+			for (int i(0); i < size; i++) {
+				sum += axes[i] * rhs.axes[i];
+			}
+		}
+		else {
+			throw out_of_range("Different sizes of vectors");
+		}
+		return sum;
+	}
+
+
 };
+template<typename T>
+std::ostream& operator<<(std::ostream& os, Vector<T> rhs)
+{
+	for (int i(0); i < rhs.get_size(); ++i) {
+		os << rhs[i] << " ";
+	}
+	return os;
+}
+template<typename T>
+Vector<T> operator*(const T lhs, Vector<T>& rhs) {
+	auto tmp = Vector<T>(rhs);
+	for (int i(0); i < rhs.get_size(); i++) {
+		tmp[i] = lhs * rhs[i];
+	}
+	return tmp;
+}
 
 template<typename T>
 double cos(Vector<T>& a, Vector<T>& b) {
-	if (a.abs()==0 || b.abs()==0) {
+	if (a.abs() == 0 || b.abs() == 0) {
 		cout << "Vector has zero lenght" << endl;
 		return 0;
 	}
@@ -158,10 +214,8 @@ double cos(Vector<T>& a, Vector<T>& b) {
 }
 template<typename T>
 Vector<T> bis(Vector<T> a, Vector<T> b) {
-	if (a.abs()==0 || b.abs()==0) {
-		cout << "Vector has zero lenght" << endl;
-		//auto tmp = Vector<T>({0}, 0);
-		return Vector<T>({ 0 }, 0);
+	if (a.abs() == 0 || b.abs() == 0) {
+		throw invalid_argument("Vector modul cannot be zero");
 	}
 	auto a_abs = a.abs();
 	auto b_abs = b.abs();
@@ -171,44 +225,4 @@ Vector<T> bis(Vector<T> a, Vector<T> b) {
 	return tmp + a;
 }
 
-template<typename T>
-Vector<T> operator*(const T lhs, Vector<T>& rhs) {
-	auto tmp = Vector<T>(rhs);
-	for (int i(0); i < rhs.get_size(); i++) {
-		tmp[i] = lhs * rhs[i];
-	}
-	return tmp;
-}
-template<typename T>
-Vector<complex<T>> operator*(const T lhs, Vector<complex<T>>& rhs) {
-	auto tmp = Vector<complex<T>>(rhs);
-	for (int i(0); i < rhs.get_size(); i++) {
-		tmp[i] *= lhs;
-	}
-	return tmp;
-}
-template<typename T>
-complex<T> operator*(Vector<complex<T>>& lhs, Vector<complex<T>>& rhs) {
-	complex<T> sum(0.0, 0.0);
-	if (lhs.get_size() == rhs.get_size()) {
-		complex<T> a;
-		complex<T> b;
-		for (int i(0); i < lhs.get_size(); i++) {
-			a = lhs[i];
-			b = complex<T>(rhs[i].real(), rhs[i].imag() * (-1));
-			sum += a * b;
-		}
-	}
-	return sum;
-}
-template<typename T>
-std::ostream& operator<<(std::ostream& os, Vector<T> rhs)
-{
-	for (int i(0); i < rhs.get_size(); ++i) {
-		os << rhs[i] << " ";
-	}
-	return os;
-}
-
-
-//надо переделать под комплексные: оператор скалярного произв, модуль; разобраться с исключениями и генератором случайных чисел для конструктора по умолч;
+//надо разобраться с комплексными числами
