@@ -6,12 +6,14 @@ int main() {
 	srand(unsigned(time(0)));
 	//auto v1 = complex(1.0f, 0.0f);
 	//auto v2 = complex(0.0f, 1.0f);
-	//complex<float> list1[]{ complex(3.0f, 1.0f), complex(4.0f, 5.0f) };
-	//complex<float> list2[]{ complex(1.0f, 5.0f), complex(1.0f, 0.0f) };
-	//Vector<complex<float>> v1 = Vector<complex<float>>(list1, 2);
-	//Vector<complex<float>> v2 = Vector<complex<float>>(list2, 2);
-	//cout << v1;
-	//auto v3 = complex(v1.real(), v1.imag() * (-1));
+	complex<float> list1[]{ complex(3.0f, 1.0f), complex(4.0f, 5.0f) };
+	complex<float> list2[]{ complex(1.0f, 5.0f), complex(1.0f, 0.0f) };
+	Vector<complex<float>> v1 = Vector<complex<float>>(list1, 2);
+	Vector<complex<float>> v2 = Vector<complex<float>>(list2, 2);
+	cout << endl<< v1 * v2;
+	//auto v3 = complex<float>(4, 0) * v1;
+	
+	//auto v3 = complex(v1[0].real(), v1[0].imag() * (-1));
 	//cout << v3;
 	//cout << v1 * v2;
 	//complex<float> list1[]{ complex(3.0f, 1.0f), complex(4.0f, 5.0f) };
