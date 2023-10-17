@@ -172,10 +172,11 @@ public:
 		return !((*this) == rhs);
 	}
 
-	T operator*(const Vector& rhs) {
-		T sum = 0;
+	T operator*(const Vector<T>& rhs) {
+		T sum = 0; 
 		if (size == rhs.size) {
 			for (int i(0); i < size; i++) {
+				cout << sum;
 				sum += axes[i] * rhs.axes[i];
 			}
 		}
@@ -184,7 +185,6 @@ public:
 		}
 		return sum;
 	}
-
 
 };
 template<typename T>

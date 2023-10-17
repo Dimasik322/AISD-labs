@@ -1,21 +1,37 @@
 #include <vector/vector.h>
 
-#include <iostream>
-#include <complex> 
+//#include <iostream>
 
 int main() {
 	srand(unsigned(time(0)));
-	float list1[]{ 1, 0 };
-	float list2[]{ 0, 1 };
-	int list3[]{ 0, 1 };
-	float list4[]{ 4.0f, 4.0f };
-	float list5[]{ 7.0f, 3.0f };
-	auto v1 = Vector(list1, 2);
-	auto v2 = Vector(list2, 2);
-	auto v3 = Vector(list3, 2);
-	auto v4 = Vector(list4, 2);
-	auto v5 = Vector(list5, 2);
-	cout << bis(v1, v2)<< endl;
+	//auto v1 = complex(1.0f, 0.0f);
+	//auto v2 = complex(0.0f, 1.0f);
+	//complex<float> list1[]{ complex(3.0f, 1.0f), complex(4.0f, 5.0f) };
+	//complex<float> list2[]{ complex(1.0f, 5.0f), complex(1.0f, 0.0f) };
+	//Vector<complex<float>> v1 = Vector<complex<float>>(list1, 2);
+	//Vector<complex<float>> v2 = Vector<complex<float>>(list2, 2);
+	//cout << v1;
+	//auto v3 = complex(v1.real(), v1.imag() * (-1));
+	//cout << v3;
+	//cout << v1 * v2;
+	//complex<float> list1[]{ complex(3.0f, 1.0f), complex(4.0f, 5.0f) };
+	//Vector<complex<float>> v1 = Vector<complex<float>>(list1, 2);
+	//cout << v1;
+
+
+
+	//float list1[]{ 1, 0 };
+	//auto v1 = Vector<int>();
+	//float list2[]{ 0, 1 };
+	//int list3[]{ 0, 1 };
+	//float list4[]{ 4.0f, 4.0f };
+	//float list5[]{ 7.0f, 3.0f };
+	//auto v1 = Vector(list1, 2);
+	//auto v2 = Vector(list2, 2);
+	//auto v3 = Vector(list3, 2);
+	//auto v4 = Vector(list4, 2);
+	//auto v5 = Vector(list5, 2);
+	//cout << bis(v1, v2)<< endl;
 	//auto v3 = Vector<int>();
 	//cout << v3;
 	//complex<int> list[]{complex(3, 1), complex(1, 2)};
