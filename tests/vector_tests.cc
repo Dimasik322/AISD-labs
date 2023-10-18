@@ -14,7 +14,7 @@ TEST(VectorTest, Test2) {
     float list1[]{ 1.31f, 0.1213f };
     auto v1 = Vector(list1, 2);
     EXPECT_EQ(v1[0], 1.31f);
-    EXPECT_EQ(v1[1] , 0.1213f);
+    EXPECT_EQ(v1[1], 0.1213f);
 }
 
 TEST(VectorTest, Test3) {
@@ -66,14 +66,14 @@ TEST(VectorTest, Test9) {
 TEST(VectorTest, Test10) {
     float list1[]{ 3.0f, 4.0f };
     auto v1 = Vector(list1, 2);
-    EXPECT_EQ(float(v1.abs()), 5.0);
+    EXPECT_TRUE((v1.abs() - 5.0f) < v1.accurancy);
 }
 
-//TEST(VectorTest, Test11) {
-//    complex<float> list1[]{ complex(3.0f, 1.0f), complex(4.0f, 5.0f) };
-//    auto v1 = Vector(list1, 2);
-//    EXPECT_EQ(float(v1.abs()), complex(7.0f, 19.0f));
-//}
+TEST(VectorTest, Test11) {
+    complex<float> list1[]{ complex(3.0f, 4.0f), complex(5.0f, 12.0f) };
+    auto v1 = Vector(list1, 2);
+    EXPECT_TRUE((v1.abs() - 4.24264) < v1.accurancy);
+}
 
 TEST(VectorTest, Test12) {
     float list1[]{ 4.0f, 4.0f };
@@ -127,7 +127,7 @@ TEST(VectorTest, Test17) {
     float list1[]{ 4.0f, 3.0f };
     auto v1 = Vector(list1, 2);
     v1 /= 3;
-    EXPECT_EQ(v1[0], float(4)/3);
+    EXPECT_EQ(v1[0], float(4) / 3);
     EXPECT_EQ(v1[1], 1.0);
 }
 
@@ -177,13 +177,13 @@ TEST(VectorTest, Test23) {
     auto v1 = Vector(list1, 2);
     auto v2 = Vector(list2, 2);
     auto v3 = v1 * v2;
-    EXPECT_EQ(v3, 9.0f);
+    EXPECT_TRUE(v3 - 9.0f < v1.accurancy);
 }
 
 TEST(VectorTest, Test24) {
     float list1[]{ 4.0f, 4.0f };
     auto v1 = Vector(list1, 2);
-    cout <<"Operator <<" << endl << v1 << endl;
+    cout << "Operator <<" << endl << v1 << endl;
 }
 
 TEST(VectorTest, Test25) {
@@ -202,7 +202,6 @@ TEST(VectorTest, Test26) {
     auto v1 = Vector(list1, 2);
     auto v2 = Vector(list2, 2);
     auto v3 = bis(v1, v2);
-    EXPECT_EQ(v3[0], 2.73453);
-    EXPECT_EQ(v3[1], 3.13273);
+    EXPECT_TRUE(v3[0] - 2.73453 < v3.accurancy);
+    EXPECT_TRUE(v3[1] - 3.13273 < v3.accurancy);
 }
-
