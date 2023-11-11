@@ -3,16 +3,11 @@
 #include <iostream>
 
 int main() {
-	srand(unsigned(time(0)));
-	float list1[]{ 1, 0 };
-	auto v1 = Vector<float>(list1, 2);
-	float list2[]{ 0, 1 };
-	auto v2 = Vector<float>(list2, 2);
-	cout << bis(v1, v2);
-	cout << v1 / 5 << endl;
-	cout << v1 * 5 << endl;
-	cout <<  5.1f * v1 << endl;
-	cout << v1[1];
-	return 0;
+	LinkedList<int> list1;
+	list1.push_tail(1);
+	list1.push_tail(2);
+	list1.push_tail(3);
+	cout << list1;
 
+	return 0;
 }
