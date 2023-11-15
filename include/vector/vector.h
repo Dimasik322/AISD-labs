@@ -192,8 +192,10 @@ public:
 
 	void operator=(const LinkedList<T>& other) {
 		Node<T>* current = head;
-		while (current) {
-			this->pop_head();
+		while (head) {
+			head = head->next;
+			delete current;
+			current = nullptr;
 		}
 		current = other.head;
 		while (current) {
@@ -220,7 +222,7 @@ std::ostream& operator<<(std::ostream& os, LinkedList<T>& rhs)
 }
 
 template<typename T>
-LinkedList<T>& operator+(const LinkedList<T>& lhs, const LinkedList<T>& rhs) {
+LinkedList<T> operator+(const LinkedList<T>& lhs, const LinkedList<T>& rhs) {
 	LinkedList<T> new_list;
 	Node<T>* current = lhs.get_head();
 	while (current) {
@@ -241,10 +243,28 @@ T get_value(const LinkedList<T>& list, const T x) {
 	int count = 0;
 	Node<T>* current = list.get_head();
 	while (current) {
-		cout << current->value << " * " << x << "^" << count << " + ";
 		sum += (current->value * pow(x, count));
 		count += 1;
 		current = current->next;
 	}
 	return sum;
 }
+
+template<typename T>
+void print(LinkedList<T>& list)
+{
+	int count = 0;
+	Node<T>* current = list.get_head();
+	while (current) {
+		if (count != 0) {
+			cout << " + ";
+			cout << current->value << "*" << "x" << "^" << count;
+		}
+		else {
+			cout << current->value;
+		}
+		count += 1;
+		current = current->next;
+	}
+}
+
