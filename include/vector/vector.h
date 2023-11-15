@@ -41,6 +41,8 @@ public:
 			tmp_other = tmp_other->next;
 		}
 	}
+
+	//ѕеределал конструкторы, заполн€ющие список рандомными значени€ми
 	LinkedList(const int size, const int rand_max, const int max_power) {
 		head = nullptr;
 		int count = 0;
@@ -161,9 +163,10 @@ public:
 			}
 		}
 	}
+
+	//ƒобавление в начало списка сделал через создание нового списка, заполнени€ его элементами из other, потом из текущего, удалением текущего и присвоением этого списка в текущий
 	void push_head(const LinkedList<T>& other) {
 		LinkedList<T> new_list;
-		//Node<T>* tmp = this->head;
 		if (other.head != nullptr) {
 			Node<T>* tmp_other = other.head;
 			while (tmp_other) {
@@ -270,6 +273,8 @@ LinkedList<T> operator+(const LinkedList<T>& lhs, const LinkedList<T>& rhs) {
 	return new_list;
 }
 
+
+//¬ычисление полинома через структуру Coef, котора€ хранит коэффициент и степень икса
 template<typename T>
 T get_value(const LinkedList<Coef<T>>& list, const T x) {
 	T sum = 0;
@@ -279,22 +284,4 @@ T get_value(const LinkedList<Coef<T>>& list, const T x) {
 		current = current->next;
 	}
 	return sum;
-}
-
-template<typename T>
-void print(LinkedList<T>& list)
-{
-	int count = 0;
-	Node<T>* current = list.get_head();
-	while (current) {
-		if (count != 0) {
-			cout << " + ";
-			cout << current->value << "*" << "x" << "^" << count;
-		}
-		else {
-			cout << current->value;
-		}
-		count += 1;
-		current = current->next;
-	}
 }
