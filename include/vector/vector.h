@@ -7,6 +7,15 @@
 using namespace std;
 
 template<typename T>
+class Coef {
+public:
+	T coef;
+	int power;
+
+	Coef(const T& coef, const int& power) :coef(coef), power(power) {};
+};
+
+template<typename T>
 class Node {
 public:
 	T value;
@@ -32,19 +41,19 @@ public:
 			tmp_other = tmp_other->next;
 		}
 	}
-	LinkedList(const int size, const int rand_max) {
+	LinkedList(const int size, const int rand_max, const int max_power) {
 		head = nullptr;
 		int count = 0;
 		while (count != size) {
-			this->push_tail((int)(rand()) * rand_max / RAND_MAX + 1);
+			this->push_tail(Coef<int>((int)(rand()) * rand_max / RAND_MAX + 1, (int)(rand()) * rand_max / RAND_MAX + 1));
 			count += 1;
 		}
 	}
-	LinkedList(const int size, const float rand_max) {
+	LinkedList(const int size, const float rand_max, const int max_power) {
 		head = nullptr;
 		int count = 0;
 		while (count != size) {
-			this->push_tail((float)(rand()) * (rand_max - 0.0001f) / RAND_MAX + 0.0001f);
+			this->push_tail(Coef<float>((float)(rand()) * (rand_max - 0.0001f) / RAND_MAX + 0.0001f, (int)(rand()) * rand_max / RAND_MAX + 1));
 			count += 1;
 		}
 	}
@@ -58,7 +67,7 @@ public:
 		}
 	}
 
-	Node<T>* get_head() const{
+	Node<T>* get_head() const {
 		return head;
 	}
 	T& operator[](const int index) {
@@ -88,7 +97,7 @@ public:
 			}
 			newNode->prev = current;
 			current->next = newNode;
-			
+
 		}
 	}
 	void push_head(const T& value) {
@@ -139,7 +148,7 @@ public:
 			}
 			delete last;
 			last = nullptr;
-			
+
 
 		}
 	}
@@ -153,13 +162,30 @@ public:
 		}
 	}
 	void push_head(const LinkedList<T>& other) {
+		LinkedList<T> new_list;
+		//Node<T>* tmp = this->head;
 		if (other.head != nullptr) {
 			Node<T>* tmp_other = other.head;
 			while (tmp_other) {
-				this->push_head(tmp_other->value);
+				new_list.push_tail(tmp_other->value);
 				tmp_other = tmp_other->next;
 			}
 		}
+		if (this->head != nullptr) {
+			Node<T>* tmp_this = this->head;
+			while (tmp_this) {
+				new_list.push_tail(tmp_this->value);
+				tmp_this = tmp_this->next;
+			}
+		}
+		while (head) {
+			Node<T>* tmp = head;
+			head = head->next;
+			delete tmp;
+			tmp = nullptr;
+		}
+		this->head = new_list.head;
+		new_list.head = nullptr;
 	}
 	void delete_node(const T& x) {
 		if (head != nullptr) {
@@ -214,10 +240,17 @@ std::ostream& operator<<(std::ostream& os, LinkedList<T>& rhs)
 		os << "List is empty";
 		return os;
 	}
-	while (tmp != nullptr){
+	while (tmp != nullptr) {
 		os << tmp->value << " ";
 		tmp = tmp->next;
 	}
+	return os;
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, Coef<T>& rhs)
+{
+	os << rhs.coef << "*x^" << rhs.power;
 	return os;
 }
 
@@ -238,13 +271,11 @@ LinkedList<T> operator+(const LinkedList<T>& lhs, const LinkedList<T>& rhs) {
 }
 
 template<typename T>
-T get_value(const LinkedList<T>& list, const T x) {
+T get_value(const LinkedList<Coef<T>>& list, const T x) {
 	T sum = 0;
-	int count = 0;
-	Node<T>* current = list.get_head();
+	auto current = list.get_head();
 	while (current) {
-		sum += (current->value * pow(x, count));
-		count += 1;
+		sum = sum + (current->value.coef * pow(x, current->value.power));
 		current = current->next;
 	}
 	return sum;
@@ -267,4 +298,3 @@ void print(LinkedList<T>& list)
 		current = current->next;
 	}
 }
-
