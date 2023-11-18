@@ -15,6 +15,16 @@ public:
 	Coef(const T& coef, const int& power) :coef(coef), power(power) {};
 };
 
+template <typename T>
+bool operator==(const Coef<T>& lhs, const Coef<T>& rhs) {
+	if (lhs.coef == rhs.coef && lhs.power == rhs.power) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 template<typename T>
 class Node {
 public:
@@ -43,11 +53,29 @@ public:
 	}
 
 	//Переделал конструкторы, заполняющие список рандомными значениями
+
+	LinkedList(const int size, const int rand_max) {
+		head = nullptr;
+		int count = 0;
+		while (count != size) {
+			this->push_tail((int)(rand()) * rand_max / RAND_MAX + 1);
+			count += 1;
+		}
+	}
+	LinkedList(const int size, const float rand_max) {
+		head = nullptr;
+		int count = 0;
+		while (count != size) {
+			this->push_tail((float)(rand()) * (rand_max - 0.0001f) / RAND_MAX + 0.0001f);
+			count += 1;
+		}
+	}
+
 	LinkedList(const int size, const int rand_max, const int max_power) {
 		head = nullptr;
 		int count = 0;
 		while (count != size) {
-			this->push_tail(Coef<int>((int)(rand()) * rand_max / RAND_MAX + 1, (int)(rand()) * rand_max / RAND_MAX + 1));
+			this->push_tail(Coef<int>((int)(rand()) * rand_max / RAND_MAX + 1, (int)(rand()) * max_power / RAND_MAX + 1));
 			count += 1;
 		}
 	}
@@ -55,10 +83,11 @@ public:
 		head = nullptr;
 		int count = 0;
 		while (count != size) {
-			this->push_tail(Coef<float>((float)(rand()) * (rand_max - 0.0001f) / RAND_MAX + 0.0001f, (int)(rand()) * rand_max / RAND_MAX + 1));
+			this->push_tail(Coef<float>((float)(rand()) * (rand_max - 0.0001f) / RAND_MAX + 0.0001f, (int)(rand()) * max_power / RAND_MAX + 1));
 			count += 1;
 		}
 	}
+
 	~LinkedList() {
 		while (head) {
 			Node<T>* tmp = head;
