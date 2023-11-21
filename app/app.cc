@@ -5,12 +5,13 @@
 int main() {
 	srand(unsigned(time(0)));
 
-	//проверка всех функций для списка в качестве полинома
 	/*auto list1 = LinkedList<Coef<int>>();
 	list1.push_tail(Coef<int>(1, 2));
 	list1.push_tail(Coef<int>(2, 4));
 	list1.push_tail(Coef<int>(1, 5));
 	list1.push_head(Coef<int>(6, 8));
+	list1.push_head(Coef<int>(6, 0));
+	list1.push_tail(Coef<int>(6, 0)); 
 	auto list2 = list1;
 	auto list3 = LinkedList<Coef<int>>(list2);
 	auto list4 = LinkedList<Coef<int>>();
@@ -23,10 +24,18 @@ int main() {
 	list3.delete_node(Coef<int>(1, 2));
 	cout << list3 << endl;
 	cout << list3[2] << endl;
-	cout << get_value(list1, 2) << endl;
+	cout << list1.get_value(2) << endl;
 	auto list_random = LinkedList<Coef<int>>(4, 10, 5);
 	cout << list_random << endl;*/
 
+
+	/*auto list1 = LinkedList<Coef<int>>();
+	list1.push_tail(Coef<int>(1, 2));
+	list1.push_tail(Coef<int>(2, 4));
+	list1.push_tail(Coef<int>(1, 5));
+	list1.push_tail(Coef<int>(1, 0));
+	list1[0] = Coef<int>(1, 0);
+	cout << list1;*/
 
 	//проверка функций обычного списка
 	/*auto list1 = LinkedList<int>();
@@ -49,7 +58,6 @@ int main() {
 	cout << list3 << endl;
 	auto list_random = LinkedList<int>(4, 10);
 	cout << list_random << endl;*/
-
 
 
 	return 0;
