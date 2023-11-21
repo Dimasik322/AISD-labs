@@ -10,8 +10,8 @@ int main() {
 	list1.push_tail(Coef<int>(2, 4));
 	list1.push_tail(Coef<int>(1, 5));
 	list1.push_head(Coef<int>(6, 8));
-	list1.push_head(Coef<int>(6, 0));
-	list1.push_tail(Coef<int>(6, 0)); 
+	list1.push_head(Coef<int>(0, 2));
+	list1.push_tail(Coef<int>(0, 2)); 
 	auto list2 = list1;
 	auto list3 = LinkedList<Coef<int>>(list2);
 	auto list4 = LinkedList<Coef<int>>();
@@ -33,8 +33,8 @@ int main() {
 	list1.push_tail(Coef<int>(1, 2));
 	list1.push_tail(Coef<int>(2, 4));
 	list1.push_tail(Coef<int>(1, 5));
-	list1.push_tail(Coef<int>(1, 0));
-	list1[0] = Coef<int>(1, 0);
+	list1.push_tail(Coef<int>(0, 2));
+	list1[0] = Coef<int>(0, 2);
 	cout << list1;*/
 
 	//проверка функций обычного списка

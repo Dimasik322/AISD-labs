@@ -15,8 +15,8 @@ public:
 	Coef(const T& coef, const int& power) :coef(coef), power(power) {};
 
 	void operator=(const Coef<T>& rhs) {
-		if (rhs.power == 0) {
-			throw invalid_argument("Степень не может быть равна 0");
+		if (rhs.coef == 0) {
+			throw invalid_argument("Коэффициент не может быть равен 0");
 		}
 		else {
 			this->coef = rhs.coef;
@@ -314,7 +314,7 @@ public:
 	}
 
 	void push_tail(const Coef<T>& value) {
-		if (value.power == 0) {
+		if (value.coef == 0) {
 			return;
 		}
 		Node<Coef<T>>* newNode = new Node<Coef<T>>(value);
@@ -332,7 +332,7 @@ public:
 		}
 	}
 	void push_head(const Coef<T>& value) {
-		if (value.power == 0) {
+		if (value.coef == 0) {
 			return;
 		}
 		Node<Coef<T>>* newNode = new Node<Coef<T>>(value);
