@@ -4,10 +4,11 @@
 
 int main() {
 	srand(unsigned(time(0)));
-	vector<int> array = sorted_array<int>(10000, true);
-	//cout << array;
-	auto stat_bubble = bubble_sort(array);
-	//cout << array;
-	cout << stat_bubble;
+	auto array = random_array<int>(10);
+	cout << array;
+	auto stat_shell = bubble_sort(array.begin(), array.end());
+	cout << array;
+	//cout << stat_bubble;
+	//compare_sort_sorted<int>(10000, true);
 	return 0;
 }
