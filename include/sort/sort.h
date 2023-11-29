@@ -6,6 +6,8 @@
 #include <exception>
 //#include <iterator>
 
+//сортировки выбором, быстра€ и naturial two-way merge sort
+
 using namespace std;
 
 class TestClass {
@@ -60,13 +62,7 @@ std::ostream& operator<<(std::ostream& os, TestClass rhs) {
 	return os;
 }
 
-template<typename T>
-void swap(std::vector<T>& array, int a, int b) {
-	T tmp = array[a];
-	array[a] = array[b];
-	array[b] = tmp;
-}
-
+/*
 template<typename T>
 stats& bubble_sort(vector<T> array) {
 	stats sort_stats;
@@ -155,6 +151,87 @@ template<typename Iterator>
 stats& pyramid_sort(Iterator begin, Iterator end) {
 
 }
+*/
+
+template<typename T>
+stats& selection_sort(vector<T> array) {
+	stats sort_stats;
+	for (int i(0); i < array.size()-1; ++i) {
+		sort_stats.comparison_count += 1;
+		int min_index = i;
+		for (int j(i + 1); j < array.size(); ++j) {
+			sort_stats.comparison_count += 1;
+			if (array[min_index] > array[j]) {
+				sort_stats.comparison_count += 1;
+				min_index = j;
+			}
+			sort_stats.comparison_count += 1;
+		}
+		sort_stats.comparison_count += 1;
+		if (min_index != i) {
+			sort_stats.comparison_count += 1;
+			swap(array[i], array[min_index]);
+			sort_stats.copy_count += 3;
+		}
+		sort_stats.comparison_count += 1;
+	}
+	//cout << array << endl;
+	sort_stats.comparison_count += 1;
+	return sort_stats;
+}
+
+template<typename Iter>
+stats& selection_sort(Iter begin, Iter end) {
+	stats sort_stats;
+	for (auto i(begin); i != end - 1; ++i) {
+		sort_stats.comparison_count += 1;
+		auto min_iter = i;
+		for (auto j(i + 1); j != end; ++j) {
+			sort_stats.comparison_count += 1;
+			if (*j < *min_iter) {
+				min_iter = j;
+			}
+			sort_stats.comparison_count += 1;
+		}
+		sort_stats.comparison_count += 1;
+		if (min_iter != i) {
+			swap(*min_iter, *i);
+			sort_stats.copy_count += 3;
+		}
+		sort_stats.comparison_count += 1;
+	}
+	sort_stats.comparison_count += 1;
+	return sort_stats;
+}
+
+template<typename T>
+stats& quick_sort(vector<T> array) {
+	stats sort_stats;
+
+	return sort_stats;
+}
+
+template<typename Iter>
+stats& quick_sort(Iter begin, Iter end) {
+	stats sort_stats;
+
+	return sort_stats;
+}
+
+template<typename T>
+stats& merge_sort(vector<T> array) {
+	stats sort_stats;
+
+	return sort_stats;
+}
+
+template<typename Iter>
+stats& merge_sort(Iter begin, Iter end) {
+	stats sort_stats;
+
+	return sort_stats;
+}
+
 
 template<typename T>
 vector<T> random_array(const int& len) {
@@ -266,20 +343,27 @@ void compare_sort_random(const int& len) {
 		throw length_error("ћассив не может быть отрицательным или нулевым");
 	}
 	cout << len << ":" << endl;
-	stats stat_bubble;
-	stats stat_shell;
-	stats stat_pyramid;
+	//stats stat_bubble;
+	//stats stat_shell;
+	//stats stat_pyramid;
+	stats stat_select;
+	//stats stat_quick;
+	//stats stat_merge;
 	for (int i(0); i < 100; ++i) {
+		cout << i + 1 << "/" << 100 << endl;
 		vector<T> array = random_array<T>(len);
-		stat_bubble += bubble_sort(array);
-		stat_shell += shell_sort(array);
+		stat_select += selection_sort(array);
+		//stat_bubble += bubble_sort(array);
+		//stat_shell += shell_sort(array);
 		//stat_pyramid += shell_pyramid(array);
 	}
-	stat_bubble /= 100;
-	stat_shell /= 100;
+	//stat_bubble /= 100;
+	//stat_shell /= 100;
 	//stat_pyramid /= 100;
-	cout << "bubble : " << stat_bubble << endl;
-	cout << "shell : " << stat_shell << endl;
+	stat_select /= 100;
+	cout << "selection : " << stat_select << endl;
+	//cout << "bubble : " << stat_bubble << endl;
+	//cout << "shell : " << stat_shell << endl;
 	//cout << "pyramid : " << stat_pyramid << endl;
 }
 
@@ -288,23 +372,23 @@ void compare_sort_sorted(const int& len, const bool& reverse) {
 	if (len <= 0) {
 		throw length_error("ћассив не может быть отрицательным или нулевым");
 	}
-	stats stat_bubble;
-	stats stat_shell;
-	stats stat_pyramid;
-	vector<T> array = sorted_array<T>(len, reverse);
+	//stats stat_bubble;
+	//stats stat_shell;
+	//stats stat_pyramid;
+	//vector<T> array = sorted_array<T>(len, reverse);
 	if (reverse == true) {
 		cout << len << " reverse sorted:" << endl;
 	}
 	else {
 		cout << len << " sorted:" << endl;
 	}
-	stat_bubble += bubble_sort(array);
-	stat_shell += shell_sort(array);
+	//stat_bubble += bubble_sort(array);
+	//stat_shell += shell_sort(array);
 	//stat_pyramid += shell_pyramid(array);
 
-	cout << "bubble : " << stat_bubble << endl;
-	cout << "shell : " << stat_shell << endl;
+	//cout << "bubble : " << stat_bubble << endl;
+	//cout << "shell : " << stat_shell << endl;
 	//cout << "pyramid : " << stat_pyramid << endl;
 }
 
-//Ќадо сделать пирамидальную, решить что-то по поводу скорости работы, графики
+//Ќадо сделать quick и merge, возможно решить что-то по поводу скорости работы, графики
