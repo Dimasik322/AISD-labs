@@ -153,6 +153,8 @@ stats& pyramid_sort(Iterator begin, Iterator end) {
 }
 */
 
+
+//select sort обычная
 template<typename T>
 stats& selection_sort(vector<T> array) {
 	stats sort_stats;
@@ -175,11 +177,13 @@ stats& selection_sort(vector<T> array) {
 		}
 		sort_stats.comparison_count += 1;
 	}
-	//cout << array << endl;
+	cout << array << endl;
 	sort_stats.comparison_count += 1;
 	return sort_stats;
 }
 
+
+//select sort через итераторы
 template<typename Iter>
 stats& selection_sort(Iter begin, Iter end) {
 	stats sort_stats;
@@ -204,20 +208,122 @@ stats& selection_sort(Iter begin, Iter end) {
 	return sort_stats;
 }
 
+/*template<typename T>
+stats& selection_sort(vector<T> array) {
+	stats sort_stats;
+	sort_stats += selection_sort(array.begin(), array.end());
+	cout << array;
+	return selection_sort;
+}*/
+
+//quick sort обычная
+template<typename T>
+stats& quick_sort(T* array, int size) {
+	stats sort_stats;
+	if (size <= 1) {
+		sort_stats.comparison_count += 1;
+		return sort_stats;
+	}
+	T pivot = array[0];
+	int i = 0;
+	int j = size - 1;
+	while (i <= j) {
+		sort_stats.comparison_count += 1;
+		while (array[i] < pivot) {
+			sort_stats.comparison_count += 1;
+			++i;
+		}
+		sort_stats.comparison_count += 1;
+		while (array[j] > pivot) {
+			sort_stats.comparison_count += 1;
+			--j;
+		}
+		sort_stats.comparison_count += 1;
+		//cout << array[i] << " " << array[j] << endl;
+		if (i <= j) {
+			swap(array[i], array[j]);
+			sort_stats.copy_count += 3;
+			++i;
+			--j;
+		}
+		sort_stats.comparison_count += 1;
+		/*for (int k(0); k < size; ++k) {
+			cout << *(array + k) << " ";
+		}
+		cout << endl;*/
+	}
+	sort_stats.comparison_count += 1;
+
+	sort_stats += quick_sort(array, j + 1);
+	sort_stats += quick_sort(array + i, size - i);
+
+	return sort_stats;
+}
+
 template<typename T>
 stats& quick_sort(vector<T> array) {
 	stats sort_stats;
-
+	sort_stats += quick_sort(&array[0], array.size());
+	cout << array;
 	return sort_stats;
 }
 
+//quick sort через итераторы
 template<typename Iter>
 stats& quick_sort(Iter begin, Iter end) {
 	stats sort_stats;
+	if (begin == end) {
+		sort_stats.comparison_count += 1;
+		return sort_stats;
+	}
+	/*Iter k = begin;
+	while (k != end) {
+		cout << *k << " ";
+		++k;
+	}
+	cout << endl;*/
+	Iter pivot = begin;
+	Iter i = begin + 1;
+	Iter j = end;
+	while (i != j) {
+		sort_stats.comparison_count += 1;
+		if (*i < *pivot) {
+			++i;
+		}
+		else {
+			--j;
+			while (i != j && *j >= *pivot) {
+				sort_stats.comparison_count += 1;
+				--j;
+				//cout << *i << " " << *j << " " << *pivot << endl;
+			}
+			sort_stats.comparison_count += 1;
+			swap(*i, *j);
+			sort_stats.copy_count += 3;
+		}
+		sort_stats.comparison_count += 1;
+	}
+	sort_stats.comparison_count += 1;
+	--i;
+	swap(*begin, *i);
+	sort_stats.copy_count += 3;
+	sort_stats.comparison_count += 1;
+
+	sort_stats += quick_sort(begin, i);
+	sort_stats += quick_sort(j, end);
 
 	return sort_stats;
 }
 
+/*template<typename T>
+stats& quick_sort(vector<T> array) {
+	stats sort_stats;
+	sort_stats += quick_sort(array.begin(), array.end());
+	cout << array;
+	return sort_stats;
+}*/
+
+//merge sort обычная
 template<typename T>
 stats& merge_sort(vector<T> array) {
 	stats sort_stats;
@@ -225,6 +331,7 @@ stats& merge_sort(vector<T> array) {
 	return sort_stats;
 }
 
+//merge sort через итераторы
 template<typename Iter>
 stats& merge_sort(Iter begin, Iter end) {
 	stats sort_stats;
