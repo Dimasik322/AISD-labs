@@ -4,9 +4,8 @@
 #include <iostream>
 #include <random>
 #include <exception>
-//#include <iterator>
 
-//сортировки выбором, быстрая и naturial two-way merge sort
+
 
 using namespace std;
 
@@ -62,96 +61,6 @@ std::ostream& operator<<(std::ostream& os, TestClass rhs) {
 	return os;
 }
 
-/*
-template<typename T>
-stats& bubble_sort(vector<T> array) {
-	stats sort_stats;
-	for (int i(0); i < (array.size() - 1); ++i) {
-		sort_stats.comparison_count += 1;
-		for (int j(0); j < (array.size() - i - 1); ++j){
-			sort_stats.comparison_count += 1;
-			if (array[j] > array[j + 1]) {
-				swap(array, j, j + 1);
-				sort_stats.copy_count += 3;
-			}
-			sort_stats.comparison_count += 1;
-		}
-		sort_stats.comparison_count += 1;
-	}
-	sort_stats.comparison_count += 1;
-	return sort_stats;
-}
-
-template<class Iterator>
-stats& bubble_sort(Iterator begin, Iterator end) {
-	stats sort_stats;
-	--end;
-	for (auto i(begin); i < end; i++) {
-		sort_stats.comparison_count += 1;
-		for (auto j(begin); j != end; j++) {
-			sort_stats.comparison_count += 1;
-			if (*j > *(j + 1)) {
-				sort_stats.comparison_count += 1;
-				swap(*j, *(j + 1));
-				sort_stats.copy_count += 3;
-			}
-		}
-		sort_stats.comparison_count += 1;
-	}
-	sort_stats.comparison_count += 1;
-	return sort_stats;
-}
-
-template<typename T>
-stats& shell_sort(vector<T> array) {
-	stats sort_stats;
-	for (int i(int(array.size())); i > 0; i /= 2){
-		sort_stats.comparison_count += 1;
-		for (int j(i); j < (array.size()); ++j) {
-			sort_stats.comparison_count += 1;
-			for (int k(j - i); (k >= 0) && (array[k] > array[k + i]); k -= i) {
-				sort_stats.comparison_count += 1;
-				swap(array, k, k+i);
-				sort_stats.copy_count += 3;
-			}
-			sort_stats.comparison_count += 1;
-		}
-		sort_stats.comparison_count += 1;
-	}
-	sort_stats.comparison_count += 1;
-	return sort_stats;
-}
-
-template<typename Iterator>
-stats& shell_sort(Iterator begin, Iterator end) {
-	stats sort_stats;
-	for (auto i = (end - begin) / 2; i != 0; i /= 2) {
-		sort_stats.comparison_count += 1;
-		for (auto j = begin + i; j != end; ++j) {
-			sort_stats.comparison_count += 1;
-			for (auto k = j; k - begin >= i && (*k < *(k - i)); k -= i) {
-				sort_stats.comparison_count += 1;
-				std::swap(*k, *(k - i));
-				sort_stats.copy_count += 3;
-			}
-			sort_stats.comparison_count += 1;
-		}
-		sort_stats.comparison_count += 1;
-	}
-	sort_stats.comparison_count += 1;
-	return sort_stats;
-}
-
-template<typename T>
-stats& pyramid_sort(vector<T> array) {
-
-}
-
-template<typename Iterator>
-stats& pyramid_sort(Iterator begin, Iterator end) {
-
-}
-*/
 
 
 //select sort обычная
@@ -177,11 +86,10 @@ stats& selection_sort(vector<T> array) {
 		}
 		sort_stats.comparison_count += 1;
 	}
-	cout << array << endl;
+	//cout << array << endl;
 	sort_stats.comparison_count += 1;
 	return sort_stats;
 }
-
 
 //select sort через итераторы
 template<typename Iter>
@@ -264,7 +172,7 @@ template<typename T>
 stats& quick_sort(vector<T> array) {
 	stats sort_stats;
 	sort_stats += quick_sort(&array[0], array.size());
-	cout << array;
+	//cout << array;
 	return sort_stats;
 }
 
@@ -325,9 +233,79 @@ stats& quick_sort(vector<T> array) {
 
 //merge sort обычная
 template<typename T>
+stats& merge(vector<T>& array, int start, int mid, int end) {
+	stats sort_stats;
+	int n1 = mid - start + 1;
+	int n2 = end - mid;
+	vector<T> left(n1);
+	vector<T> right(n2);
+	for (int i(0); i < n1; ++i) {
+		sort_stats.comparison_count += 1;
+		left[i] = array[start + i];
+		sort_stats.copy_count += 1;
+	}
+	for (int j(0); j < n2; ++j) {
+		sort_stats.comparison_count += 1;
+		right[j] = array[mid + 1 + j];
+		sort_stats.copy_count += 1;
+	}
+	int i = 0;
+	int j = 0;
+	int k = start;
+	while (i<n1 && j<n2) {
+		sort_stats.comparison_count += 1;
+		if (left[i] <= right[j]){
+			array[k] = left[i];
+			sort_stats.copy_count += 1;
+			++i;
+		}
+		else {
+			array[k] = right[j];
+			sort_stats.copy_count += 1;
+			++j;
+		}
+		sort_stats.comparison_count += 1;
+		++k;
+	}
+	sort_stats.comparison_count += 1;
+	while (i < n1) {
+		sort_stats.comparison_count += 1;
+		array[k] = left[i];
+		sort_stats.copy_count += 1;
+		++i;
+		++k;
+	}
+	sort_stats.comparison_count += 1;
+	while (j < n2) {
+		sort_stats.comparison_count += 1;
+		array[k] = right[j];
+		sort_stats.copy_count += 1;
+		++j;
+		++k;
+	}
+	sort_stats.comparison_count += 1;
+
+	return sort_stats;
+}
+
+template<typename T>
+stats& merge_sort(vector<T>& array, int i, int j) {
+	stats sort_stats;
+	if (i < j) {
+		int mid = i + (j - i) / 2;
+		sort_stats += merge_sort(array, i, mid);
+		sort_stats += merge_sort(array, mid + 1, j);
+		sort_stats += merge(array, i, mid, j);
+	}
+	sort_stats.comparison_count += 1;
+	return sort_stats;
+}
+
+template<typename T>
 stats& merge_sort(vector<T> array) {
 	stats sort_stats;
-
+	sort_stats += merge_sort(array, 0, array.size() - 1);
+	//cout << array;
 	return sort_stats;
 }
 
@@ -338,6 +316,7 @@ stats& merge_sort(Iter begin, Iter end) {
 
 	return sort_stats;
 }
+
 
 
 template<typename T>
@@ -393,14 +372,12 @@ vector<string> random_array<string>(const int& len) {
 		throw length_error("Массив не может быть отрицательным или нулевым");
 	}
 	vector<string> array{};
-	//array.resize(len);
 	array.reserve(len);
 	for (int i(0); i < len; ++i) {
 		string str{};
 		for (int j(0); j < 10; ++j) {
 			str += char((int)(rand()) * 26 / RAND_MAX + 97);
 		}
-		//array[i] = str;
 		array.emplace_back(str);
 	}
 	return array;
@@ -450,28 +427,26 @@ void compare_sort_random(const int& len) {
 		throw length_error("Массив не может быть отрицательным или нулевым");
 	}
 	cout << len << ":" << endl;
-	//stats stat_bubble;
-	//stats stat_shell;
-	//stats stat_pyramid;
+
 	stats stat_select;
-	//stats stat_quick;
-	//stats stat_merge;
+	stats stat_quick;
+	stats stat_merge;
+
 	for (int i(0); i < 100; ++i) {
 		cout << i + 1 << "/" << 100 << endl;
 		vector<T> array = random_array<T>(len);
 		stat_select += selection_sort(array);
-		//stat_bubble += bubble_sort(array);
-		//stat_shell += shell_sort(array);
-		//stat_pyramid += shell_pyramid(array);
+		stat_quick += quick_sort(array);
+		stat_merge += merge_sort(array);
 	}
-	//stat_bubble /= 100;
-	//stat_shell /= 100;
-	//stat_pyramid /= 100;
+
 	stat_select /= 100;
+	stat_quick /= 100;
+	stat_merge /= 100;
+
 	cout << "selection : " << stat_select << endl;
-	//cout << "bubble : " << stat_bubble << endl;
-	//cout << "shell : " << stat_shell << endl;
-	//cout << "pyramid : " << stat_pyramid << endl;
+	cout << "quick : " << stat_quick << endl;
+	cout << "merge : " << stat_merge << endl;
 }
 
 template<typename T>
@@ -479,23 +454,28 @@ void compare_sort_sorted(const int& len, const bool& reverse) {
 	if (len <= 0) {
 		throw length_error("Массив не может быть отрицательным или нулевым");
 	}
-	//stats stat_bubble;
-	//stats stat_shell;
-	//stats stat_pyramid;
-	//vector<T> array = sorted_array<T>(len, reverse);
+
+	stats stat_select;
+	stats stat_quick;
+	stats stat_merge;
+
+	vector<T> array = sorted_array<T>(len, reverse);
+
 	if (reverse == true) {
 		cout << len << " reverse sorted:" << endl;
 	}
 	else {
 		cout << len << " sorted:" << endl;
 	}
-	//stat_bubble += bubble_sort(array);
-	//stat_shell += shell_sort(array);
-	//stat_pyramid += shell_pyramid(array);
 
-	//cout << "bubble : " << stat_bubble << endl;
-	//cout << "shell : " << stat_shell << endl;
-	//cout << "pyramid : " << stat_pyramid << endl;
+	stat_select += selection_sort(array);
+	stat_quick += quick_sort(array);
+	stat_merge += merge_sort(array);
+
+	cout << "selection : " << stat_select << endl;
+	cout << "quick : " << stat_quick << endl;
+	cout << "merge : " << stat_merge << endl;
 }
 
-//Надо сделать quick и merge, возможно решить что-то по поводу скорости работы, графики
+
+//доделать merge через итераторы
