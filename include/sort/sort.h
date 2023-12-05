@@ -73,21 +73,15 @@ stats& selection_sort(vector<T> array) {
 		for (int j(i + 1); j < array.size(); ++j) {
 			sort_stats.comparison_count += 1;
 			if (array[min_index] > array[j]) {
-				sort_stats.comparison_count += 1;
+
 				min_index = j;
 			}
 			sort_stats.comparison_count += 1;
 		}
-		sort_stats.comparison_count += 1;
 		if (min_index != i) {
-			sort_stats.comparison_count += 1;
 			swap(array[i], array[min_index]);
-			sort_stats.copy_count += 3;
 		}
-		sort_stats.comparison_count += 1;
 	}
-	//cout << array << endl;
-	sort_stats.comparison_count += 1;
 	return sort_stats;
 }
 
@@ -129,28 +123,24 @@ template<typename T>
 stats& quick_sort(T* array, int size) {
 	stats sort_stats;
 	if (size <= 1) {
-		sort_stats.comparison_count += 1;
 		return sort_stats;
 	}
+	sort_stats.copy_count += 1;
 	T pivot = array[0];
 	int i = 0;
 	int j = size - 1;
 	while (i <= j) {
-		sort_stats.comparison_count += 1;
 		while (array[i] < pivot) {
 			sort_stats.comparison_count += 1;
 			++i;
 		}
-		sort_stats.comparison_count += 1;
 		while (array[j] > pivot) {
 			sort_stats.comparison_count += 1;
 			--j;
 		}
-		sort_stats.comparison_count += 1;
 		//cout << array[i] << " " << array[j] << endl;
 		if (i <= j) {
 			swap(array[i], array[j]);
-			sort_stats.copy_count += 3;
 			++i;
 			--j;
 		}
@@ -160,7 +150,6 @@ stats& quick_sort(T* array, int size) {
 		}
 		cout << endl;*/
 	}
-	sort_stats.comparison_count += 1;
 
 	sort_stats += quick_sort(array, j + 1);
 	sort_stats += quick_sort(array + i, size - i);
@@ -233,71 +222,61 @@ stats& quick_sort(vector<T> array) {
 
 //merge sort обычная
 template<typename T>
-stats& merge(vector<T>& array, int start, int mid, int end) {
+stats& merge(vector<T>& array, int begin, int mid, int end) {
 	stats sort_stats;
-	int n1 = mid - start + 1;
+	int n1 = mid - begin + 1;
 	int n2 = end - mid;
 	vector<T> left(n1);
 	vector<T> right(n2);
+	sort_stats.copy_count += n1;
+	sort_stats.copy_count += n2;
 	for (int i(0); i < n1; ++i) {
-		sort_stats.comparison_count += 1;
-		left[i] = array[start + i];
-		sort_stats.copy_count += 1;
+		left[i] = array[begin + i];
 	}
 	for (int j(0); j < n2; ++j) {
-		sort_stats.comparison_count += 1;
 		right[j] = array[mid + 1 + j];
-		sort_stats.copy_count += 1;
 	}
 	int i = 0;
 	int j = 0;
-	int k = start;
+	int k = begin;
 	while (i<n1 && j<n2) {
 		sort_stats.comparison_count += 1;
 		if (left[i] <= right[j]){
 			array[k] = left[i];
-			sort_stats.copy_count += 1;
 			++i;
 		}
 		else {
 			array[k] = right[j];
-			sort_stats.copy_count += 1;
 			++j;
 		}
-		sort_stats.comparison_count += 1;
 		++k;
 	}
 	sort_stats.comparison_count += 1;
 	while (i < n1) {
 		sort_stats.comparison_count += 1;
 		array[k] = left[i];
-		sort_stats.copy_count += 1;
 		++i;
 		++k;
 	}
-	sort_stats.comparison_count += 1;
 	while (j < n2) {
 		sort_stats.comparison_count += 1;
 		array[k] = right[j];
-		sort_stats.copy_count += 1;
 		++j;
 		++k;
 	}
-	sort_stats.comparison_count += 1;
 
 	return sort_stats;
 }
 
 template<typename T>
-stats& merge_sort(vector<T>& array, int i, int j) {
+stats& merge_sort(vector<T>& array, int begin, int end) {
 	stats sort_stats;
-	if (i < j) {
-		int mid = i + (j - i) / 2;
-		sort_stats += merge_sort(array, i, mid);
-		sort_stats += merge_sort(array, mid + 1, j);
-		sort_stats += merge(array, i, mid, j);
+	if (begin < end) {
+		int mid = begin + (end - begin) / 2;
+		sort_stats += merge_sort(array, begin, mid);
+		sort_stats += merge_sort(array, mid + 1, end);
+		sort_stats += merge(array, begin, mid, end);
 	}
-	sort_stats.comparison_count += 1;
 	return sort_stats;
 }
 
@@ -310,13 +289,76 @@ stats& merge_sort(vector<T> array) {
 }
 
 //merge sort через итераторы
-template<typename Iter>
-stats& merge_sort(Iter begin, Iter end) {
-	stats sort_stats;
 
+template<typename Iter, typename T>
+stats& merge(vector<T>& array, Iter begin, Iter mid, Iter end) {
+	stats sort_stats;
+	vector<T> new_array(distance(begin, end));
+	auto i = begin;
+	auto j = mid;
+	auto k = new_array.begin();
+	while (i < mid && j < end) {
+		sort_stats.comparison_count += 1;
+		if (*i < *j) {
+			*k = *i;
+			++k;
+			++i;
+		}
+		else {
+			*k = *j;
+			++k;
+			++j;
+		}
+	}
+	sort_stats.comparison_count += 1;
+	while (i < mid) {
+		sort_stats.comparison_count += 1;
+		*k = *i;
+		sort_stats.copy_count += 1;
+		++k;
+		++i;
+	}
+	sort_stats.comparison_count += 1;
+	while (j < end) {
+		sort_stats.comparison_count += 1;
+		*k = *j;
+		sort_stats.copy_count += 1;
+		++k;
+		++j;
+	}
+	sort_stats.comparison_count += 1;
+	sort_stats.copy_count += 1;
+	copy(new_array.begin(), new_array.end(), begin);
+	/*Iter l = begin;
+	while (l != end) {
+		cout << *l << " ";
+		++l;
+	}
+	cout << endl;*/
 	return sort_stats;
 }
 
+//merge sort через итераторы
+template<typename Iter, typename T>
+stats& merge_sort(vector<T>& arr, Iter begin, Iter end) {
+	stats sort_stats;
+	if (distance(begin, end) > 1) {
+		sort_stats.comparison_count += 1;
+		auto mid = begin + (distance(begin, end) / 2);
+		sort_stats += merge_sort(arr, begin, mid);
+		sort_stats += merge_sort(arr, mid, end);
+		sort_stats += merge(arr, begin, mid, end);
+	}
+	return sort_stats;
+}
+
+//template<typename T>
+//stats& merge_sort(vector<T> arr) {
+//	stats sort_stats;
+//	sort_stats += merge_sort(arr, arr.begin(), arr.end());
+//	cout << arr;
+//	return sort_stats;
+//}
 
 
 template<typename T>
@@ -435,7 +477,7 @@ void compare_sort_random(const int& len) {
 	for (int i(0); i < 100; ++i) {
 		cout << i + 1 << "/" << 100 << endl;
 		vector<T> array = random_array<T>(len);
-		stat_select += selection_sort(array);
+		//stat_select += selection_sort(array);
 		stat_quick += quick_sort(array);
 		stat_merge += merge_sort(array);
 	}
@@ -476,6 +518,3 @@ void compare_sort_sorted(const int& len, const bool& reverse) {
 	cout << "quick : " << stat_quick << endl;
 	cout << "merge : " << stat_merge << endl;
 }
-
-
-//доделать merge через итераторы
