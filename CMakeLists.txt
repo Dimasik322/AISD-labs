@@ -18,8 +18,8 @@ if(MSVC)
 endif()
 
 # Объявляем библиотеку
-add_library(vector SHARED "include/vector/vector.h" "src/vector.cc")
-target_include_directories(vector PUBLIC "include")
+add_library(set SHARED "include/set/set.h" "src/set.cc")
+target_include_directories(set PUBLIC "include")
 
 # Подключаем googletest
 include(FetchContent)
@@ -28,9 +28,9 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # Объявляем тесты
-add_executable(vector_tests "tests/vector_tests.cc")
-target_link_libraries(vector_tests vector GTest::gtest_main)
+add_executable(tests "tests/tests.cc")
+target_link_libraries(tests vector GTest::gtest_main)
 
 # Ну и мою менюшку тоже объявить надо
 add_executable(app "app/app.cc")
-target_link_libraries(app vector GTest::gtest_main)
+target_link_libraries(app set GTest::gtest_main)
