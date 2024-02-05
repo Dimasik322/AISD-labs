@@ -15,12 +15,4 @@ int main() {
 	set1.insert(6);
 	set1.print();
 
-	auto set2 = my_set();
-	set2.insert(5);
-	set2.insert(2);
-	set2.insert(7);
-	set2.print();
-
-	set2 = set1;
-	set2.print();
 }
