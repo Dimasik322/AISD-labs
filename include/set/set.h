@@ -20,6 +20,15 @@ class my_set {
 private:
 	Node* head;
 
+	Node* copy(Node*& ptr) {
+		if (ptr == nullptr) {
+			return nullptr;
+		}
+		auto tmp = new Node(ptr->value);
+		tmp->left = copy(ptr->left);
+		tmp->right = copy(ptr->right);
+		return tmp;
+	}
 	void delete_set(Node*& ptr) {
 		if (ptr == nullptr) {
 			return;
@@ -30,24 +39,91 @@ private:
 		delete ptr;
 		ptr = nullptr;
 	}
+	int height(Node*& ptr) {
+		if (ptr == nullptr) {
+			return 0;
+		}
+		return max(height(ptr->left), height(ptr->right)) + 1;
+	}
+	int ratio(Node*& ptr) {
+		if (ptr == nullptr) {
+			return 0;
+		}
+		return (height(ptr->left) - height(ptr->right));
+	}
+	Node*& rotate_left(Node*& ptr) {
+		auto tmp = ptr->right;
+		ptr->right = tmp->left;
+		tmp->left = ptr;
+		return tmp;
+	}
+	Node*& rotate_right(Node*& ptr) {
+		auto tmp = ptr->left;
+		ptr->left = tmp->right;
+		tmp->right = ptr;
+		return tmp;
+	}
+	Node*& balance(Node*& ptr) {
+		auto x = ratio(ptr);
+		if (x > 1) {
+			if (ratio(ptr->left) >= 0) {
+				return rotate_right(ptr);
+			}
+			else {
+				ptr->left = rotate_left(ptr->left);
+				return rotate_right(ptr);
+			}
+		}
+		if (x < -1) {
+			if (ratio(ptr->right) <= 0) {
+				return rotate_left(ptr);
+			}
+			else {
+				ptr->right = rotate_right(ptr->right);
+				return rotate_left(ptr);
+			}
+		}
+		return ptr;
+	}
+
+	Node* erase(Node* ptr, const int& value) {
+		if (ptr == nullptr) {
+			throw invalid_argument("Cannot erase non-existent value");
+		}
+		if (value < ptr->value) {
+			ptr->left = erase(ptr->left, value);
+		}
+		else if (value > ptr->value) {
+			ptr->right = erase(ptr->right, value);
+		}
+		else {
+			//???????????????????????????????????
+		}
+		return balance(ptr);
+	}
+	Node* insert(Node*& ptr, const int& value) {
+		if (ptr == nullptr) {
+			return new Node(value);
+		}
+		if (value < ptr->value) {
+			ptr->left = insert(ptr->left, value);
+		}
+		else if (value > ptr->value) {
+			ptr->right = insert(ptr->right, value);
+		}
+		else {
+			return ptr;
+		}
+		return balance(ptr);
+	}
 	void print(Node*& ptr) {
 		if (ptr != nullptr) {
 			cout << ptr->value << " ";
 			this->print(ptr->left);
 			this->print(ptr->right);
 		}
-	}
-	void insert(Node*& ptr, const int& value) {
-		if (ptr == nullptr) {
-			auto new_node = new Node(value);
-			ptr = new_node;
-			return;
-		}
-		if (value > ptr->value) {
-			insert(ptr->right, value);
-		}
 		else {
-			insert(ptr->left, value);
+			cout << "- ";
 		}
 	}
 	bool contains(Node*& ptr, const int& value) {
@@ -63,15 +139,6 @@ private:
 		else {
 			return contains(ptr->right, value);
 		}
-	}
-	Node* copy(Node*& ptr) {
-		if (ptr == nullptr) {
-			return nullptr;
-		}
-		auto tmp = new Node(ptr->value);
-		tmp->left = copy(ptr->left);
-		tmp->right = copy(ptr->right);
-		return tmp;
 	}
 
 public:
@@ -89,16 +156,23 @@ public:
 		head = copy(other.head);
 	}
 
+	void insert(const int& value) {
+		head = insert(head, value);
+	}
 	void print() {
 		print(head);
 		cout << endl;
 	}
-	void insert(const int& value) {
-		insert(head, value);
-	}
 	bool contains(const int& value) {
 		return contains(head, value);
 	}
+	void erase(const int& value) {
+		head = erase(head, value);
+	}
 };
 
-//Надо сделать erase и балансировку, функцию для неповторяющихся элементов
+vector<int, int>& get_unique(vector<int, int>& vec) {
+	//?????????????????????????
+}
+
+//Надо доделать erase, функцию для неповторяющихся элементов

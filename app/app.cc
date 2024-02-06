@@ -3,16 +3,14 @@
 
 int main() {
 	auto set1 = my_set();
-	set1.insert(13);
-	set1.insert(8);
-	set1.insert(17);
-	set1.insert(15);
-	set1.insert(25);
-	set1.insert(22);
-	set1.insert(27);
-	set1.insert(1);
+	set1.insert(5);
+	set1.insert(2);
+	set1.insert(7);
+	set1.insert(9);
 	set1.insert(11);
-	set1.insert(6);
-	set1.print();
+	set1.insert(13);
+	set1.insert(7);
+	set1.insert(7);
 
+	set1.print();
 }
