@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <exception>
+#include <vector>
+#include <ctime>
 
 using namespace std;
 
@@ -20,7 +22,7 @@ class my_set {
 private:
 	Node* head;
 
-	Node* copy(Node*& ptr) {
+	Node* copy(Node* ptr) {
 		if (ptr == nullptr) {
 			return nullptr;
 		}
@@ -29,7 +31,7 @@ private:
 		tmp->right = copy(ptr->right);
 		return tmp;
 	}
-	void delete_set(Node*& ptr) {
+	void delete_set(Node* ptr) {
 		if (ptr == nullptr) {
 			return;
 		}
@@ -37,33 +39,32 @@ private:
 		delete_set(ptr->right);
 		//cout<< endl << "del " << ptr->value;
 		delete ptr;
-		ptr = nullptr;
 	}
-	int height(Node*& ptr) {
+	int height(Node* ptr) {
 		if (ptr == nullptr) {
 			return 0;
 		}
-		return max(height(ptr->left), height(ptr->right)) + 1;
+		return std::max(height(ptr->left), height(ptr->right)) + 1;
 	}
-	int ratio(Node*& ptr) {
+	int ratio(Node* ptr) {
 		if (ptr == nullptr) {
 			return 0;
 		}
 		return (height(ptr->left) - height(ptr->right));
 	}
-	Node*& rotate_left(Node*& ptr) {
+	Node* rotate_left(Node* ptr) {
 		auto tmp = ptr->right;
 		ptr->right = tmp->left;
 		tmp->left = ptr;
 		return tmp;
 	}
-	Node*& rotate_right(Node*& ptr) {
+	Node* rotate_right(Node* ptr) {
 		auto tmp = ptr->left;
 		ptr->left = tmp->right;
 		tmp->right = ptr;
 		return tmp;
 	}
-	Node*& balance(Node*& ptr) {
+	Node* balance(Node* ptr) {
 		auto x = ratio(ptr);
 		if (x > 1) {
 			if (ratio(ptr->left) >= 0) {
@@ -85,10 +86,22 @@ private:
 		}
 		return ptr;
 	}
+	Node* min(Node* ptr) {
+		while (ptr->left != nullptr) {
+			ptr = ptr->left;
+		}
+		return ptr;
+	}
+	Node* max(Node* ptr) {
+		while (ptr->right != nullptr) {
+			ptr = ptr->right;
+		}
+		return ptr;
+	}
 
-	Node* erase(Node* ptr, const int& value) {
+	Node* erase(Node* ptr, const int value) {
 		if (ptr == nullptr) {
-			throw invalid_argument("Cannot erase non-existent value");
+			return nullptr;
 		}
 		if (value < ptr->value) {
 			ptr->left = erase(ptr->left, value);
@@ -97,11 +110,33 @@ private:
 			ptr->right = erase(ptr->right, value);
 		}
 		else {
-			//???????????????????????????????????
+			if (ptr->left == nullptr || ptr->right == nullptr) {
+				Node* tmp;
+				if (ptr->left != nullptr) {
+					tmp = ptr->left;
+				}
+				else {
+					tmp = ptr->right;
+				}
+				if (tmp == nullptr) {
+					tmp = ptr;
+					ptr = nullptr;
+				}
+				else {
+					*ptr = *tmp;
+				}
+				delete tmp;
+			}
+			else {
+				auto tmp = min(ptr->right);
+				ptr->value = tmp->value;
+				ptr->right = erase(ptr->right, tmp->value);
+			}
+			
 		}
 		return balance(ptr);
 	}
-	Node* insert(Node*& ptr, const int& value) {
+	Node* insert(Node* ptr, const int value) {
 		if (ptr == nullptr) {
 			return new Node(value);
 		}
@@ -116,7 +151,7 @@ private:
 		}
 		return balance(ptr);
 	}
-	void print(Node*& ptr) {
+	void print(Node* ptr) {
 		if (ptr != nullptr) {
 			cout << ptr->value << " ";
 			this->print(ptr->left);
@@ -126,7 +161,7 @@ private:
 			cout << "- ";
 		}
 	}
-	bool contains(Node*& ptr, const int& value) {
+	bool contains(Node* ptr, const int value) {
 		if (ptr == nullptr) {
 			return false;
 		}
@@ -147,7 +182,7 @@ public:
 		head = copy(other.head);
 	}
 	~my_set() {
-		cout << "Destruct set";
+		//cout << "Destruct set";
 		delete_set(head);
 	}
 
@@ -155,24 +190,126 @@ public:
 		delete_set(head);
 		head = copy(other.head);
 	}
+	int min() {
+		return min(head)->value;
+	}
+	int max() {
+		return max(head)->value;
+	}
+	void clear() {
+		delete_set(head);
+		head = nullptr;
+	}
 
-	void insert(const int& value) {
+	void insert(const int value) {
 		head = insert(head, value);
 	}
 	void print() {
 		print(head);
 		cout << endl;
 	}
-	bool contains(const int& value) {
+	bool contains(const int value) {
 		return contains(head, value);
 	}
-	void erase(const int& value) {
+	void erase(const int value) {
 		head = erase(head, value);
 	}
 };
 
-vector<int, int>& get_unique(vector<int, int>& vec) {
-	//?????????????????????????
+size_t lcg() {
+	static size_t x = 0;
+	x = (1021 * x + 24631) % 116640;
+	return x;
 }
 
-//Надо доделать erase, функцию для неповторяющихся элементов
+void compare(int lenght) {
+	unsigned int vec_time = 0;
+	unsigned int set_time = 0;
+	unsigned int time;
+
+	vector<int> vec;
+	my_set set;
+	for (int i(0); i < 100; ++i) {
+		for (int j(0); j < lenght; ++j) {
+			int value = lcg();
+			//cout << value << endl;
+
+			time = clock();
+			vec.push_back(value);
+			vec_time += clock() - time;
+
+			time = clock();
+			set.insert(value);
+			set_time += clock() - time;
+		}
+		vec.clear();
+		set.clear();
+	}
+	cout << "Insertion:" << endl;
+	cout << "vector : " << double(vec_time) / 100 <<" ms" << endl;
+	cout << "set : " << double(set_time) / 100 <<" ms" << endl;
+
+	vec_time = 0;
+	set_time = 0;
+
+	for (int i(0); i < lenght; ++i) {
+		int value = lcg();
+		vec.push_back(value);
+		set.insert(value);
+	}
+	bool flag = false;
+	for (int i(0); i < 1000; ++i) {
+		int value = lcg();
+
+		time = clock();
+		for (int j = 0; j != vec.size(); ++j) {
+			if (vec[j] == value) {
+				break;
+			}
+		}
+		vec_time += clock() - time;
+
+		time = clock();
+		flag = set.contains(value);
+		set_time += clock() - time;
+	}
+	vec.clear();
+	set.clear();
+	cout << "Search:" << endl;
+	cout << "vector : " << double(vec_time) / 100 << " ms" << endl;
+	cout << "set : " << double(set_time) / 100 << " ms" << endl;
+
+	vec_time = 0;
+	set_time = 0;
+
+	for (int i(0); i < lenght; ++i) {
+		int value = lcg();
+		vec.push_back(value);
+		set.insert(value);
+	}
+	for (int i(0); i < 1000; ++i) {
+		int value = lcg();
+
+		time = clock();
+		vec.push_back(value);
+		vec.pop_back();
+		vec_time += clock() - time;
+
+		time = clock();
+		set.insert(value);
+		set.erase(value);
+		set_time += clock() - time;
+	}
+	vec.clear();
+	set.clear();
+	cout << "Insertion & erasing:" << endl;
+	cout << "vector : " << double(vec_time) / 100 << " ms" << endl;
+	cout << "set : " << double(set_time) / 100 << " ms" << endl;
+}
+
+
+//vector<int, int>& get_unique(vector<int, int>& vec) {
+	//?????????????????????????
+//}
+
+//Надо доделать функцию для неповторяющихся элементов
