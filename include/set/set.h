@@ -307,9 +307,20 @@ void compare(int lenght) {
 	cout << "set : " << double(set_time) / 100 << " ms" << endl;
 }
 
-
-//vector<int, int>& get_unique(vector<int, int>& vec) {
-	//?????????????????????????
-//}
+vector<int> get_unique(vector<int> vec) {
+	vector<int> unique;
+	for (int i(0); i < vec.size(); ++i) {
+		bool flag = false;
+		for (int j(0); j < vec.size(); ++j) {
+			if (i != j && vec[i] == vec[j]) {
+				flag = true;
+			}
+		}
+		if (flag == false) {
+			unique.push_back(vec[i]);
+		}
+	}
+	return unique;
+}
 
 //Надо доделать функцию для неповторяющихся элементов
