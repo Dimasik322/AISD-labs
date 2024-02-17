@@ -98,6 +98,15 @@ private:
 		}
 		return ptr;
 	}
+	void to_vector(Node* ptr, vector<int>& vec) {
+		if (ptr == nullptr) {
+			return;
+		}
+		vec.push_back(ptr->value);
+		to_vector(ptr->left, vec);
+		to_vector(ptr->right, vec);
+
+	}
 
 	Node* erase(Node* ptr, const int value) {
 		if (ptr == nullptr) {
@@ -132,7 +141,7 @@ private:
 				ptr->value = tmp->value;
 				ptr->right = erase(ptr->right, tmp->value);
 			}
-			
+
 		}
 		return balance(ptr);
 	}
@@ -165,14 +174,14 @@ private:
 		if (ptr == nullptr) {
 			return false;
 		}
-		if (ptr->value != value) {
+		if (ptr->value == value) {
 			return true;
 		}
 		if (value > ptr->value) {
 			return contains(ptr->right, value);
 		}
 		else {
-			return contains(ptr->right, value);
+			return contains(ptr->left, value);
 		}
 	}
 
@@ -184,6 +193,7 @@ public:
 	~my_set() {
 		//cout << "Destruct set";
 		delete_set(head);
+		head = nullptr;
 	}
 
 	void operator=(my_set& other) {
@@ -200,9 +210,20 @@ public:
 		delete_set(head);
 		head = nullptr;
 	}
+	vector<int> to_vector() {
+		vector<int> vec;
+		to_vector(head, vec);
+		return vec;
+	}
 
-	void insert(const int value) {
-		head = insert(head, value);
+	bool insert(const int value) {
+		if (contains(value)) {
+			return false;
+		}
+		else {
+			head = insert(head, value);
+			return true;
+		}
 	}
 	void print() {
 		print(head);
@@ -211,8 +232,14 @@ public:
 	bool contains(const int value) {
 		return contains(head, value);
 	}
-	void erase(const int value) {
-		head = erase(head, value);
+	bool erase(const int value) {
+		if (!contains(value)) {
+			return false;
+		}
+		else {
+			head = erase(head, value);
+			return true;
+		}
 	}
 };
 
@@ -225,12 +252,14 @@ size_t lcg() {
 void compare(int lenght) {
 	unsigned int vec_time = 0;
 	unsigned int set_time = 0;
-	unsigned int time;
+	unsigned int time;	
 
 	vector<int> vec;
 	my_set set;
 	for (int i(0); i < 100; ++i) {
+		//cout << i;
 		for (int j(0); j < lenght; ++j) {
+			//cout << j << " ";
 			int value = lcg();
 			//cout << value << endl;
 
@@ -246,8 +275,8 @@ void compare(int lenght) {
 		set.clear();
 	}
 	cout << "Insertion:" << endl;
-	cout << "vector : " << double(vec_time) / 100 <<" ms" << endl;
-	cout << "set : " << double(set_time) / 100 <<" ms" << endl;
+	cout << "vector : " << double(vec_time) / 100.0 <<" ms" << endl;
+	cout << "set : " << double(set_time) / 100.0 <<" ms" << endl;
 
 	vec_time = 0;
 	set_time = 0;
@@ -259,6 +288,7 @@ void compare(int lenght) {
 	}
 	bool flag = false;
 	for (int i(0); i < 1000; ++i) {
+		//cout << i;
 		int value = lcg();
 
 		time = clock();
@@ -276,8 +306,8 @@ void compare(int lenght) {
 	vec.clear();
 	set.clear();
 	cout << "Search:" << endl;
-	cout << "vector : " << double(vec_time) / 100 << " ms" << endl;
-	cout << "set : " << double(set_time) / 100 << " ms" << endl;
+	cout << "vector : " << double(vec_time) / 100.0 << " ms" << endl;
+	cout << "set : " << double(set_time) / 100.0 << " ms" << endl;
 
 	vec_time = 0;
 	set_time = 0;
@@ -288,6 +318,7 @@ void compare(int lenght) {
 		set.insert(value);
 	}
 	for (int i(0); i < 1000; ++i) {
+		//cout << i;
 		int value = lcg();
 
 		time = clock();
@@ -303,24 +334,26 @@ void compare(int lenght) {
 	vec.clear();
 	set.clear();
 	cout << "Insertion & erasing:" << endl;
-	cout << "vector : " << double(vec_time) / 100 << " ms" << endl;
-	cout << "set : " << double(set_time) / 100 << " ms" << endl;
+	cout << "vector : " << double(vec_time) / 100.0 << " ms" << endl;
+	cout << "set : " << double(set_time) / 100.0 << " ms" << endl;
 }
 
 vector<int> get_unique(vector<int> vec) {
-	vector<int> unique;
+	auto set_repeat = my_set();
+	auto set_unique = my_set();
+
 	for (int i(0); i < vec.size(); ++i) {
-		bool flag = false;
-		for (int j(0); j < vec.size(); ++j) {
-			if (i != j && vec[i] == vec[j]) {
-				flag = true;
+		if (!set_unique.contains(vec[i]) && !set_repeat.contains(vec[i])) {
+			set_unique.insert(vec[i]);
+		}
+		else {
+			if (set_unique.contains(vec[i]) && !set_repeat.contains(vec[i])) {
+				set_unique.erase(vec[i]);
+				set_repeat.insert(vec[i]);
 			}
 		}
-		if (flag == false) {
-			unique.push_back(vec[i]);
-		}
 	}
+
+	vector<int> unique = set_unique.to_vector();
 	return unique;
 }
-
-//Надо доделать функцию для неповторяющихся элементов
