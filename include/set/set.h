@@ -12,10 +12,9 @@ public:
 	int value;
 	Node* left;
 	Node* right;
+	int height;
 
-	Node(int _value, Node* _left, Node* _right) : value(_value), left(_left), right(_right) {};
-	Node() :value(0), left(nullptr), right(nullptr) {};
-	Node(int _value) : value(_value), left(nullptr), right(nullptr) {};
+	Node(int _value) : value(_value), left(nullptr), right(nullptr), height(1) {};
 };
 
 class my_set {
@@ -23,7 +22,7 @@ private:
 	Node* head;
 
 	Node* copy(Node* ptr) {
-		if (ptr == nullptr) {
+		if (!ptr) {
 			return nullptr;
 		}
 		auto tmp = new Node(ptr->value);
@@ -32,7 +31,7 @@ private:
 		return tmp;
 	}
 	void delete_set(Node* ptr) {
-		if (ptr == nullptr) {
+		if (!ptr) {
 			return;
 		}
 		delete_set(ptr->left);
@@ -40,76 +39,72 @@ private:
 		//cout<< endl << "del " << ptr->value;
 		delete ptr;
 	}
+
 	int height(Node* ptr) {
-		if (ptr == nullptr) {
+		if (!ptr) {
 			return 0;
 		}
-		return std::max(height(ptr->left), height(ptr->right)) + 1;
+		return ptr->height;
 	}
 	int ratio(Node* ptr) {
-		if (ptr == nullptr) {
+		if (!ptr) {
 			return 0;
 		}
-		return (height(ptr->left) - height(ptr->right));
+		return height(ptr->left) - height(ptr->right);
 	}
 	Node* rotate_left(Node* ptr) {
-		auto tmp = ptr->right;
+		Node* tmp = ptr->right;
 		ptr->right = tmp->left;
 		tmp->left = ptr;
+
+		ptr->height = 1 + std::max(height(ptr->left), height(ptr->right));
+		tmp->height = 1 + std::max(height(tmp->left), height(tmp->right));
 		return tmp;
 	}
 	Node* rotate_right(Node* ptr) {
-		auto tmp = ptr->left;
+		Node* tmp = ptr->left;
 		ptr->left = tmp->right;
 		tmp->right = ptr;
+
+		ptr->height = 1 + std::max(height(ptr->left), height(ptr->right));
+		tmp->height = 1 + std::max(height(tmp->left), height(tmp->right));
 		return tmp;
 	}
 	Node* balance(Node* ptr) {
+		if (!ptr) {
+			return ptr;
+		}
+		ptr->height = 1 + std::max(height(ptr->left), height(ptr->right));
 		auto x = ratio(ptr);
 		if (x > 1) {
-			if (ratio(ptr->left) >= 0) {
-				return rotate_right(ptr);
-			}
-			else {
+			if (ratio(ptr->left) < 0) {
 				ptr->left = rotate_left(ptr->left);
-				return rotate_right(ptr);
 			}
+			return rotate_right(ptr);
 		}
 		if (x < -1) {
-			if (ratio(ptr->right) <= 0) {
-				return rotate_left(ptr);
-			}
-			else {
+			if (ratio(ptr->right) > 0) {
 				ptr->right = rotate_right(ptr->right);
-				return rotate_left(ptr);
 			}
+			return rotate_left(ptr);
 		}
 		return ptr;
 	}
 	Node* min(Node* ptr) {
-		while (ptr->left != nullptr) {
+		while (ptr->left) {
 			ptr = ptr->left;
 		}
 		return ptr;
 	}
 	Node* max(Node* ptr) {
-		while (ptr->right != nullptr) {
+		while (ptr->right) {
 			ptr = ptr->right;
 		}
 		return ptr;
 	}
-	void to_vector(Node* ptr, vector<int>& vec) {
-		if (ptr == nullptr) {
-			return;
-		}
-		vec.push_back(ptr->value);
-		to_vector(ptr->left, vec);
-		to_vector(ptr->right, vec);
-
-	}
 
 	Node* erase(Node* ptr, const int value) {
-		if (ptr == nullptr) {
+		if (!ptr) {
 			return nullptr;
 		}
 		if (value < ptr->value) {
@@ -146,7 +141,7 @@ private:
 		return balance(ptr);
 	}
 	Node* insert(Node* ptr, const int value) {
-		if (ptr == nullptr) {
+		if (!ptr) {
 			return new Node(value);
 		}
 		if (value < ptr->value) {
@@ -161,7 +156,7 @@ private:
 		return balance(ptr);
 	}
 	void print(Node* ptr) {
-		if (ptr != nullptr) {
+		if (ptr) {
 			cout << ptr->value << " ";
 			this->print(ptr->left);
 			this->print(ptr->right);
@@ -171,7 +166,7 @@ private:
 		}
 	}
 	bool contains(Node* ptr, const int value) {
-		if (ptr == nullptr) {
+		if (!ptr) {
 			return false;
 		}
 		if (ptr->value == value) {
@@ -185,6 +180,16 @@ private:
 		}
 	}
 
+	void to_vector(Node* ptr, vector<int>& vec) {
+		if (!ptr) {
+			return;
+		}
+		vec.push_back(ptr->value);
+		to_vector(ptr->left, vec);
+		to_vector(ptr->right, vec);
+
+	}
+
 public:
 	my_set() : head(nullptr) {};
 	my_set(my_set& other) {
@@ -195,11 +200,16 @@ public:
 		delete_set(head);
 		head = nullptr;
 	}
+	my_set& operator=(const my_set& other) {
+		if (this == &other) {
+			return *this;
+		}
 
-	void operator=(my_set& other) {
 		delete_set(head);
 		head = copy(other.head);
+		return *this;
 	}
+
 	int min() {
 		return min(head)->value;
 	}
@@ -209,11 +219,6 @@ public:
 	void clear() {
 		delete_set(head);
 		head = nullptr;
-	}
-	vector<int> to_vector() {
-		vector<int> vec;
-		to_vector(head, vec);
-		return vec;
 	}
 
 	bool insert(const int value) {
@@ -241,6 +246,12 @@ public:
 			return true;
 		}
 	}
+
+	vector<int> to_vector() {
+		vector<int> vec;
+		to_vector(head, vec);
+		return vec;
+	}
 };
 
 size_t lcg() {
@@ -252,16 +263,14 @@ size_t lcg() {
 void compare(int lenght) {
 	unsigned int vec_time = 0;
 	unsigned int set_time = 0;
-	unsigned int time;	
+	unsigned int time;
 
 	vector<int> vec;
 	my_set set;
 	for (int i(0); i < 100; ++i) {
-		//cout << i;
+
 		for (int j(0); j < lenght; ++j) {
-			//cout << j << " ";
 			int value = lcg();
-			//cout << value << endl;
 
 			time = clock();
 			vec.push_back(value);
@@ -271,12 +280,13 @@ void compare(int lenght) {
 			set.insert(value);
 			set_time += clock() - time;
 		}
+
 		vec.clear();
 		set.clear();
 	}
-	cout << "Insertion:" << endl;
-	cout << "vector : " << double(vec_time) / 100.0 <<" ms" << endl;
-	cout << "set : " << double(set_time) / 100.0 <<" ms" << endl;
+	std::cout << "Insertion:" << endl;
+	std::cout << "vector : " << double(vec_time) / 100.0 << " ms" << endl;
+	std::cout << "set : " << double(set_time) / 100.0 << " ms" << endl;
 
 	vec_time = 0;
 	set_time = 0;
@@ -288,15 +298,16 @@ void compare(int lenght) {
 	}
 	bool flag = false;
 	for (int i(0); i < 1000; ++i) {
-		//cout << i;
 		int value = lcg();
 
 		time = clock();
+
 		for (int j = 0; j != vec.size(); ++j) {
 			if (vec[j] == value) {
 				break;
 			}
 		}
+
 		vec_time += clock() - time;
 
 		time = clock();
@@ -305,9 +316,9 @@ void compare(int lenght) {
 	}
 	vec.clear();
 	set.clear();
-	cout << "Search:" << endl;
-	cout << "vector : " << double(vec_time) / 100.0 << " ms" << endl;
-	cout << "set : " << double(set_time) / 100.0 << " ms" << endl;
+	std::cout << "Search:" << endl;
+	std::cout << "vector : " << double(vec_time) / 1000.0 << " ms" << endl;
+	std::cout << "set : " << double(set_time) / 1000.0 << " ms" << endl;
 
 	vec_time = 0;
 	set_time = 0;
@@ -318,7 +329,6 @@ void compare(int lenght) {
 		set.insert(value);
 	}
 	for (int i(0); i < 1000; ++i) {
-		//cout << i;
 		int value = lcg();
 
 		time = clock();
@@ -333,23 +343,23 @@ void compare(int lenght) {
 	}
 	vec.clear();
 	set.clear();
-	cout << "Insertion & erasing:" << endl;
-	cout << "vector : " << double(vec_time) / 100.0 << " ms" << endl;
-	cout << "set : " << double(set_time) / 100.0 << " ms" << endl;
+	std::cout << "Insertion & erasing:" << endl;
+	std::cout << "vector : " << double(vec_time) / 1000.0 << " ms" << endl;
+	std::cout << "set : " << double(set_time) / 1000.0 << " ms" << endl;
 }
 
 vector<int> get_unique(vector<int> vec) {
 	auto set_repeat = my_set();
 	auto set_unique = my_set();
 
-	for (int i(0); i < vec.size(); ++i) {
-		if (!set_unique.contains(vec[i]) && !set_repeat.contains(vec[i])) {
-			set_unique.insert(vec[i]);
+	for (auto i : vec) {
+		if (!set_unique.contains(i) && !set_repeat.contains(i)) {
+			set_unique.insert(i);
 		}
 		else {
-			if (set_unique.contains(vec[i]) && !set_repeat.contains(vec[i])) {
-				set_unique.erase(vec[i]);
-				set_repeat.insert(vec[i]);
+			if (set_unique.contains(i) && !set_repeat.contains(i)) {
+				set_unique.erase(i);
+				set_repeat.insert(i);
 			}
 		}
 	}
