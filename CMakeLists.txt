@@ -18,8 +18,8 @@ if(MSVC)
 endif()
 
 # Объявляем библиотеку
-add_library(set SHARED "include/set/set.h" "src/set.cc")
-target_include_directories(set PUBLIC "include")
+add_library(map SHARED "include/map/map.h" "src/map.cc")
+target_include_directories(map PUBLIC "include")
 
 # Подключаем googletest
 include(FetchContent)
@@ -33,4 +33,4 @@ target_link_libraries(tests vector GTest::gtest_main)
 
 # Ну и мою менюшку тоже объявить надо
 add_executable(app "app/app.cc")
-target_link_libraries(app set GTest::gtest_main)
+target_link_libraries(app map GTest::gtest_main)
