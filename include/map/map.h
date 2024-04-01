@@ -13,17 +13,24 @@ struct Pair {
 	Pair<K, T>() {};
 };
 
-template<typename K, typename T>
+template<typename K>
+struct Hash {
+	size_t operator()(const K& key) const {
+		return size_t(key);
+	}
+};
+
+template<typename K, typename T, typename Hash>
 class Map {
 private:
 	size_t _size;
 	Pair<K, T>** _buskets;
+	Hash hash;
 	
-	size_t hash(const K& key) const {
-		return key % _size;
+	size_t index_hash(const K& key) const {
+		return hash(key) % _size;
 	}
-
-	void copy(const Map<K, T>& other) {
+	void copy(const Map<K, T, Hash>& other) {
 		for (size_t i(0); i < _size; ++i) {
 			auto tmp = other._buskets[i];
 			while (tmp) {
@@ -34,21 +41,28 @@ private:
 	}
 
 public:
-	Map<K, T>() {
+	Map<K, T, Hash>() {
 		_size = 10;
 		_buskets = new Pair<K, T>*[_size];
 		for (size_t i(0); i < _size; ++i) {
 			_buskets[i] = nullptr;
 		}
 	};
-	Map<K, T>(const size_t size) {
+	Map<K, T, Hash>(const size_t& size, const unsigned& seed) {
+		_size = size;
+		_buskets = new Pair<K, T>* [_size];
+		for (size_t i(0); i < size; ++i) {
+			_buskets[i] = nullptr;
+		}
+	}
+	Map<K, T, Hash>(const size_t& size) {
 		_size = size;
 		_buskets = new Pair<K, T>*[_size];
 		for (size_t i(0); i < size; ++i) {
 			_buskets[i] = nullptr;
 		}
 	}
-	Map<K, T>(const Map<K, T>& other) {
+	Map<K, T, Hash>(const Map<K, T, Hash>& other) {
 		_size = other._size;
 		_buskets = new Pair<K, T>*[_size];
 		for (size_t i(0); i < _size; ++i) {
@@ -56,12 +70,12 @@ public:
 		}
 		copy(other);
 	}
-	~Map<K, T>() {
+	~Map<K, T, Hash>() {
 		clear();
 		delete [] _buskets;
 	}
 
-	Map<K, T>& operator=(const Map<K, T>& other) {
+	Map<K, T, Hash>& operator=(const Map<K, T, Hash>& other) {
 		if (&other == this) {
 			return *this;
 		}
@@ -89,7 +103,7 @@ public:
 	}
 
 	void insert(const K& key, const T& value) {
-		size_t index = hash(key);
+		size_t index = index_hash(key);
 		auto tmp = _buskets[index];
 		if (!tmp) {
 			_buskets[index] = new Pair<K, T>(key, value);
@@ -109,7 +123,7 @@ public:
 		}
 	}
 	void insert_or_assign(const K& key, const T& value) {
-		size_t index = hash(key);
+		size_t index = index_hash(key);
 		auto tmp = _buskets[index];
 		if (!tmp) {
 			_buskets[index] = new Pair<K, T>(key, value);
@@ -142,7 +156,7 @@ public:
 		return false;
 	}
 	T* search(const K& key) {
-		size_t index = hash(key);
+		size_t index = index_hash(key);
 		auto tmp = _buskets[index];
 		if (tmp == nullptr) {
 			return nullptr;
@@ -156,7 +170,7 @@ public:
 		return nullptr;
 	}
 	bool erase(const K& key) {
-		size_t index = hash(key);
+		size_t index = index_hash(key);
 		auto tmp = _buskets[index];
 		if (tmp == nullptr) {
 			return false;
@@ -179,16 +193,15 @@ public:
 		return false;
 	}
 	int count(const K& key) {
-		int counter = 0;
-		size_t index = hash(key);
+		size_t index = index_hash(key);
 		auto tmp = _buskets[index];
 		while (tmp) {
 			if (tmp->key == key) {
-				++counter;
+				return 1;
 			}
 			tmp = tmp->next;
 		}
-		return counter;
+		return 0;
 	}
 	void print() const {
 		Pair<K, T>* tmp = nullptr;
@@ -201,6 +214,14 @@ public:
 		}
 	}
 };
+
+size_t pearson_hash(const std::string& str) {
+
+}
+
+bool is_equal(const size_t& first, const size_t& second) {
+
+}
 
 
 

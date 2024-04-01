@@ -1,19 +1,26 @@
 #include <map/map.h>
 #include <iostream>
+#include <unordered_map>
 
 using namespace std;
 
 int main() {
-	Map<int, int> map;
-	map.insert(1, 1);
-	map.insert(21, 2);
-	map.insert(3, 3);
-	map.insert(6, 4);
-	map.insert_or_assign(31, 5);
-	map.insert_or_assign(1, 6);
+	//auto hash_10 = Hash<int>(10);
+
+	Map<int, string, Hash<int>> map;
+	map.insert(1, "werfe");
+	map.insert(21, "efewe");
+	map.insert(3, "wafe");
+	map.insert(6, "efwe");
+	map.insert_or_assign(31, "egsgs");
+	map.insert_or_assign(1, "esgew");
 	map.print();
 	cout << map.erase(61) << endl;
 	map.print();
+	cout << endl;
+
+	//unordered_map<
+
 	return 0;
 	
 }
