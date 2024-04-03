@@ -14,13 +14,19 @@ struct Pair {
 };
 
 template<typename K>
-struct Hash {
+struct HashFunc {
 	size_t operator()(const K& key) const {
 		return size_t(key);
 	}
 };
 
-template<typename K, typename T, typename Hash>
+//struct PearsonHash {
+//	size_t operator()(const std::string& key) const {
+//		return 0;
+//	}
+//};
+
+template<typename K, typename T, typename Hash = HashFunc<K>>
 class Map {
 private:
 	size_t _size;
@@ -32,7 +38,7 @@ private:
 	}
 	void copy(const Map<K, T, Hash>& other) {
 		for (size_t i(0); i < _size; ++i) {
-			auto tmp = other._buskets[i];
+			Pair<K, T>* tmp = other._buskets[i];
 			while (tmp) {
 				insert(tmp->key, tmp->value);
 				tmp = tmp->next;
@@ -48,18 +54,21 @@ public:
 			_buskets[i] = nullptr;
 		}
 	};
+	Map<K, T, Hash>(const size_t& size) {
+		_size = size;
+		_buskets = new Pair<K, T>*[_size];
+		for (size_t i(0); i < size; ++i) {
+			_buskets[i] = nullptr;
+		}
+	}
 	Map<K, T, Hash>(const size_t& size, const unsigned& seed) {
 		_size = size;
 		_buskets = new Pair<K, T>* [_size];
 		for (size_t i(0); i < size; ++i) {
 			_buskets[i] = nullptr;
 		}
-	}
-	Map<K, T, Hash>(const size_t& size) {
-		_size = size;
-		_buskets = new Pair<K, T>*[_size];
 		for (size_t i(0); i < size; ++i) {
-			_buskets[i] = nullptr;
+
 		}
 	}
 	Map<K, T, Hash>(const Map<K, T, Hash>& other) {
@@ -102,7 +111,7 @@ public:
 		}
 	}
 
-	void insert(const K& key, const T& value) {
+	void insert(const K& key, const T& value) const {
 		size_t index = index_hash(key);
 		auto tmp = _buskets[index];
 		if (!tmp) {
@@ -122,7 +131,7 @@ public:
 			}
 		}
 	}
-	void insert_or_assign(const K& key, const T& value) {
+	void insert_or_assign(const K& key, const T& value) const {
 		size_t index = index_hash(key);
 		auto tmp = _buskets[index];
 		if (!tmp) {
@@ -143,7 +152,7 @@ public:
 			}
 		}
 	}
-	bool contains(const T& value) {
+	bool contains(const T& value) const {
 		for (size_t index(0); index < _size; ++index) {
 			auto tmp = _buskets[index];
 			while (tmp) {
@@ -169,7 +178,7 @@ public:
 		}
 		return nullptr;
 	}
-	bool erase(const K& key) {
+	bool erase(const K& key) const {
 		size_t index = index_hash(key);
 		auto tmp = _buskets[index];
 		if (tmp == nullptr) {
@@ -215,12 +224,33 @@ public:
 	}
 };
 
-size_t pearson_hash(const std::string& str) {
 
+std::string pearson_hash(const std::string& str) {
+	auto map = Map<int, int>(16);
+	size_t count = 0;
+	while (count != 256) {
+		unsigned x = unsigned(rand() % 256);
+		if (!map.contains(x)) {
+			//std::cout << count << ":" << x << " ";
+			map.insert(count, x);
+			++count;
+		}
+	}
+	std::string hash = "";
+	for (char c : str) {
+		hash += (char)(*map.search((unsigned char)c));
+	}
+
+	return hash;
 }
 
-bool is_equal(const size_t& first, const size_t& second) {
-
+bool is_equal(const std::string& left, const std::string& right) {
+	if (pearson_hash(left) == pearson_hash(right)) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 
