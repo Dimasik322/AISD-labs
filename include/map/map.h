@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <exception>
+#include <vector>
+#include <list>
 
 template<typename K, typename T>
 struct Pair {
@@ -20,13 +22,13 @@ struct HashFunc {
 	}
 };
 
-//struct PearsonHash {
-//	size_t operator()(const std::string& key) const {
-//		return 0;
-//	}
-//};
+struct PearsonHash {
+	size_t operator()(const char& key) const {
+		return (unsigned int)key;
+	}
+};
 
-template<typename K, typename T, typename Hash = HashFunc<K>>
+template<typename K, typename T, typename Hash = HashFunc<K>> 
 class Map {
 private:
 	size_t _size;
@@ -224,28 +226,25 @@ public:
 	}
 };
 
+std::string pearson_hash(Map<char, char, PearsonHash> map, const std::string& str) {
+	std::string hashed_str = "";
+	for (char c : str) {
+		hashed_str += *map.search(c);
+	}
+	return hashed_str;
+}
 
-std::string pearson_hash(const std::string& str) {
-	auto map = Map<int, int>(16);
+bool is_equal(const std::string& left, const std::string& right) {
+	auto map = Map<char, char, PearsonHash>(16);
 	size_t count = 0;
 	while (count != 256) {
 		unsigned x = unsigned(rand() % 256);
 		if (!map.contains(x)) {
-			//std::cout << count << ":" << x << " ";
 			map.insert(count, x);
 			++count;
 		}
 	}
-	std::string hash = "";
-	for (char c : str) {
-		hash += (char)(*map.search((unsigned char)c));
-	}
-
-	return hash;
-}
-
-bool is_equal(const std::string& left, const std::string& right) {
-	if (pearson_hash(left) == pearson_hash(right)) {
+	if (pearson_hash(map, left) == pearson_hash(map, right)) {
 		return true;
 	}
 	else {
