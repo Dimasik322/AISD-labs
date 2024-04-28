@@ -3,41 +3,27 @@
 #include <iostream>
 #include <exception>
 
-template<typename K, typename T>
+
 struct Pair {
-	K key;
-	T value;
-	Pair<K,T>* next;
+	int key;
+	int value;
+	Pair* next;
 
-	Pair<K, T>(const K& key, const T& value) : key(key), value(value), next(nullptr) {};
+	Pair(const int& key, const int& value) : key(key), value(value), next(nullptr) {};
 };
 
-template<typename K>
-struct HashFunc {
-	size_t operator()(const K& key) const {
-		return size_t(key);
-	}
-};
-
-struct PearsonHash {
-	size_t operator()(const char& key) const {
-		return (unsigned int)key;
-	}
-};
-
-template<typename K, typename T, typename Hash = HashFunc<K>>
 class Map {
 private:
 	size_t _size;
-	Pair<K, T>** _buskets;
-	Hash hash;
+	Pair** _buskets;
 	
-	size_t index_hash(const K& key) const {
-		return hash(key) % _size;
+	size_t hash(const int& key) const {
+		//Тут в return пишешь свою функцию хэша
+		return 0;
 	}
-	void copy(const Map<K, T, Hash>& other) {
+	void copy(const Map& other) {
 		for (size_t i(0); i < _size; ++i) {
-			Pair<K, T>* tmp = other._buskets[i];
+			Pair* tmp = other._buskets[i];
 			while (tmp) {
 				insert(tmp->key, tmp->value);
 				tmp = tmp->next;
@@ -46,23 +32,31 @@ private:
 	}
 
 public:
-	Map<K, T, Hash>() {
+	Map() {
 		_size = 10;
-		_buskets = new Pair<K, T>*[_size];
+		_buskets = new Pair*[_size];
 		for (size_t i(0); i < _size; ++i) {
 			_buskets[i] = nullptr;
 		}
 	};
-	Map<K, T, Hash>(const size_t& size) {
+	Map(const size_t& size) {
 		_size = size;
-		_buskets = new Pair<K, T>*[_size];
+		_buskets = new Pair*[_size];
 		for (size_t i(0); i < size; ++i) {
 			_buskets[i] = nullptr;
 		}
 	}
-	Map<K, T, Hash>(const size_t& size, const unsigned& seed) {
+	Map(const Map& other) {
+		_size = other._size;
+		_buskets = new Pair*[_size];
+		for (size_t i(0); i < _size; ++i) {
+			_buskets[i] = nullptr;
+		}
+		copy(other);
+	}
+	Map(const size_t& size, const unsigned& seed) {
 		_size = size;
-		_buskets = new Pair<K, T>* [_size];
+		_buskets = new Pair* [_size];
 		for (size_t i(0); i < size; ++i) {
 			_buskets[i] = nullptr;
 		}
@@ -77,27 +71,19 @@ public:
 			}
 		}
 	}
-	Map<K, T, Hash>(const Map<K, T, Hash>& other) {
-		_size = other._size;
-		_buskets = new Pair<K, T>*[_size];
-		for (size_t i(0); i < _size; ++i) {
-			_buskets[i] = nullptr;
-		}
-		copy(other);
-	}
-	~Map<K, T, Hash>() {
+	~Map() {
 		clear();
 		delete [] _buskets;
 	}
 
-	Map<K, T, Hash>& operator=(const Map<K, T, Hash>& other) {
+	Map& operator=(const Map& other) {
 		if (&other == this) {
 			return *this;
 		}
 		clear();
 		delete [] _buskets;
 		_size = other._size;
-		_buskets = new Pair<K, T>* [_size];
+		_buskets = new Pair* [_size];
 		for (size_t i(0); i < _size; ++i) {
 			_buskets[i] = nullptr;
 		}
@@ -106,7 +92,7 @@ public:
 	}
 
 	void clear() {
-		Pair<K, T>* tmp = nullptr;
+		Pair* tmp = nullptr;
 		for (size_t i(0); i < _size; ++i) {
 			tmp = _buskets[i];
 			while (tmp) {
@@ -117,11 +103,11 @@ public:
 		}
 	}
 
-	void insert(const K& key, const T& value) const {
-		size_t index = index_hash(key);
+	void insert(const int& key, const int& value) const {
+		size_t index = hash(key);
 		auto tmp = _buskets[index];
 		if (!tmp) {
-			_buskets[index] = new Pair<K, T>(key, value);
+			_buskets[index] = new Pair(key, value);
 			return;
 		}
 		while (tmp) {
@@ -132,16 +118,16 @@ public:
 				tmp = tmp->next;
 			}
 			else {
-				tmp->next = new Pair<K, T>(key, value);
+				tmp->next = new Pair(key, value);
 				return;
 			}
 		}
 	}
-	void insert_or_assign(const K& key, const T& value) const {
-		size_t index = index_hash(key);
+	void insert_or_assign(const int& key, const int& value) const {
+		size_t index = hash(key);
 		auto tmp = _buskets[index];
 		if (!tmp) {
-			_buskets[index] = new Pair<K, T>(key, value);
+			_buskets[index] = new Pair(key, value);
 			return;
 		}
 		while (tmp) {
@@ -153,12 +139,12 @@ public:
 				tmp = tmp->next;
 			}
 			else {
-				tmp->next = new Pair<K, T>(key, value);
+				tmp->next = new Pair(key, value);
 				return;
 			}
 		}
 	}
-	bool contains(const T& value) const {
+	bool contains(const int& value) const {
 		for (size_t index(0); index < _size; ++index) {
 			auto tmp = _buskets[index];
 			while (tmp) {
@@ -170,8 +156,8 @@ public:
 		}
 		return false;
 	}
-	T* search(const K& key) {
-		size_t index = index_hash(key);
+	int* search(const int& key) {
+		size_t index = hash(key);
 		auto tmp = _buskets[index];
 		if (tmp == nullptr) {
 			return nullptr;
@@ -184,8 +170,8 @@ public:
 		}
 		return nullptr;
 	}
-	bool erase(const K& key) const {
-		size_t index = index_hash(key);
+	bool erase(const int& key) const {
+		size_t index = hash(key);
 		auto tmp = _buskets[index];
 		if (tmp == nullptr) {
 			return false;
@@ -195,7 +181,7 @@ public:
 			delete tmp;
 			return true;
 		}
-		Pair<K, T>* prev = nullptr;
+		Pair* prev = nullptr;
 		while (tmp) {
 			if (tmp->key == key) {
 				prev->next = tmp->next;
@@ -207,8 +193,8 @@ public:
 		}
 		return false;
 	}
-	int count(const K& key) {
-		size_t index = index_hash(key);
+	int count(const int& key) {
+		size_t index = hash(key);
 		auto tmp = _buskets[index];
 		while (tmp) {
 			if (tmp->key == key) {
@@ -219,7 +205,7 @@ public:
 		return 0;
 	}
 	void print() const {
-		Pair<K, T>* tmp = nullptr;
+		Pair* tmp = nullptr;
 		for (size_t i(0); i < _size; ++i) {
 			tmp = _buskets[i];
 			while (tmp) {
@@ -230,7 +216,7 @@ public:
 	}
 };
 
-char pearson_hash(Map<char, char, PearsonHash> map, const std::string& str) {
+char pearson_hash(Map map, const std::string& str) {
 	char hash = str.length();
 	for (char c : str) {
 		hash = *map.search((hash + (unsigned)c) % 256);
@@ -239,8 +225,7 @@ char pearson_hash(Map<char, char, PearsonHash> map, const std::string& str) {
 }
 
 bool is_equal(const std::string& left, const std::string& right) {
-	auto map = Map<char, char, PearsonHash>(16, time(NULL));
-	map.print();
+	auto map = Map(16, time(NULL));
 	if (pearson_hash(map, left) == pearson_hash(map, right)) {
 		return true;
 	}
@@ -248,7 +233,4 @@ bool is_equal(const std::string& left, const std::string& right) {
 		return false;
 	}
 }
-
-
-
 
