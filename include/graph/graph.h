@@ -129,4 +129,29 @@ public:
 		}
 		return edges;
 	}
+
+	size_t order() const {
+		return graph.size();
+	}
+	size_t degree(const Vertex& v) {
+		if (has_vertex(v)) {
+			return graph[v].size();
+		}
+		throw invalid_argument("Vertex is not exists");
+	}
+
+	//Width
+	void walk(const Vertex& start_vertex, function<void(const Vertex&)> action) {
+		
+	}
+
+	//Dijkstra
+	vector<Edge> shortest_path(const Vertex& from, const Vertex& to) const {
+
+	}
+
+	//Task 1
+	Vertex radius() {
+
+	}
 };
