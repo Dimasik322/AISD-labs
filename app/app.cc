@@ -4,19 +4,24 @@
 //using namespace std;
 
 int main() {
-	Graph<int> graph;
-	graph.add_vertex(1);
-	graph.add_vertex(2);
-	graph.add_vertex(3);
-	graph.add_vertex(4);
+	Graph<char> graph;
+	graph.add_vertex('a');
+	graph.add_vertex('b');
+	graph.add_vertex('c');
+	graph.add_vertex('d');
+	graph.add_vertex('e');
+	graph.add_vertex('f');
 
-	graph.add_edge(1, 2, 5);
-	graph.add_edge(2, 1, 6);
-	graph.add_edge(3, 2, 2);
-	graph.add_edge(1, 3, 9);
-	graph.add_edge(2, 3, 7);
+	graph.add_edge('a', 'b', 1);
+	graph.add_edge('a', 'c', 15);
+	graph.add_edge('a', 'd', 1);
+	graph.add_edge('b', 'd', 1);
+	graph.add_edge('c', 'e', 15);
+	graph.add_edge('d', 'e', 1);
+	graph.add_edge('e', 'f', 1);
 
-	cout << graph.degree(5);
+	graph.walk('a', print_exc);
+
 	/*for (auto i : graph.edges()) {
 		cout << i;
 	}*/

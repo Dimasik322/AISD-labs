@@ -9,6 +9,7 @@
 #include <list>
 #include <iostream>
 #include <unordered_map>
+#include <queue>
 
 using namespace std;
 
@@ -142,7 +143,27 @@ public:
 
 	//Width
 	void walk(const Vertex& start_vertex, function<void(const Vertex&)> action) {
-		
+		queue<Vertex> q;
+		auto visited = unordered_map<Vertex, float>();
+		q.push(start_vertex);
+		//action(start_vertex);
+		visited[start_vertex] = 0;
+		while (!q.empty()) {
+			auto u = q.front();
+			q.pop();
+			for (auto e : graph[u]) {
+				auto v = e.to;
+				if (visited[v] == 0) {
+					visited[v] = visited[u] + 1;
+					q.push(v);
+					//action(v);
+				}
+			}
+		}
+		for (auto v : visited) {
+			cout << v.first << ':' << v.second << endl;
+			//action(v.first);
+		}
 	}
 
 	//Dijkstra
@@ -155,3 +176,5 @@ public:
 
 	}
 };
+
+auto print_exc = [](const auto& v) { cout << v << endl; };
