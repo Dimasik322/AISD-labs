@@ -11,17 +11,23 @@ int main() {
 	graph.add_vertex('d');
 	graph.add_vertex('e');
 	graph.add_vertex('f');
+	graph.add_vertex('g');
 
 	graph.add_edge('a', 'b', 1);
-	graph.add_edge('a', 'c', 15);
-	graph.add_edge('a', 'd', 1);
-	graph.add_edge('b', 'd', 1);
-	graph.add_edge('c', 'e', 15);
+	graph.add_edge('a', 'c', 2);
+	graph.add_edge('a', 'd', 7);
+	graph.add_edge('b', 'd', 3);
+	graph.add_edge('c', 'd', 3);
+	graph.add_edge('c', 'e', 10);
 	graph.add_edge('d', 'e', 1);
-	graph.add_edge('e', 'f', 1);
+	graph.add_edge('e', 'f', 2);
+	graph.add_edge('f', 'g', 1);
+	graph.add_edge('d', 'g', 7);
 
-	graph.walk('a', print_exc);
-
+	//graph.walk('a', print_exc);
+	for (auto v : graph.shortest_path('a', 'g')) {
+		cout << v << "->";
+	}
 	/*for (auto i : graph.edges()) {
 		cout << i;
 	}*/
