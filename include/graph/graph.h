@@ -208,13 +208,40 @@ public:
 	}
 
 	Distance eccentricity(const Vertex& v) {
-		
+		Distance max_dist = 0;
+		auto d = dijkstra(v).first;
+		for (auto dist_v : d) {
+			if (dist_v.first != v && dist_v.second > max_dist) {
+				max_dist = dist_v.second;
+			}
+		}
+		return max_dist;
 	}
 
-	//Task 1
-	Vertex radius() {
-		
+	vector<Vertex> center() {
+		vector<Vertex> center;
+		Distance min_e = NULL;
+		for (auto v : vertices()) {
+			auto ecc_v = eccentricity(v);
+			if (min_e == NULL || ecc_v <= min_e) {
+				if (ecc_v < min_e) {
+					center.clear();
+				}
+				min_e = ecc_v;
+				center.push_back(v);
+			}
+		}
+		return center;
 	}
 };
 
 auto print_exc = [](const auto& v) { cout << v << endl; };
+
+template<typename Vertex>
+ostream& operator<<(ostream& os, const vector<Vertex>& vec) {
+	os << "Vertices:";
+	for (auto v : vec) {
+		os << ' ' << v;
+	}
+	return os;
+}
