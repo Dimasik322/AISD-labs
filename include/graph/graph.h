@@ -34,12 +34,12 @@ public:
 private:
 	unordered_map<Vertex, list<Edge>> graph;
 
-	pair<unordered_map<Vertex, Distance>, unordered_map<Vertex, Vertex>> dijkstra(const Vertex& from) {
+	pair<unordered_map<Vertex, Distance>, unordered_map<Vertex, Vertex>> dijkstra(const Vertex& from) const {
 		unordered_map<Vertex, Distance> d;
 		unordered_map<Vertex, Vertex> prev;
 		for (auto v : vertices()) {
-			d[v] = numeric_limits<Distance>::max();
-			prev[v] = NULL;
+			d[*v] = numeric_limits<Distance>::max();
+			prev[*v] = NULL;
 		}
 		d[from] = 0;
 		vector<Vertex> q;
@@ -48,10 +48,10 @@ private:
 			sort(q.begin(), q.end());
 			auto u = q.front();
 			q.erase(q.begin());
-			for (auto e : graph[u]) {
+			for (auto e : graph.at(u)) {
 				auto v = e.to;
 				auto weight = e.d;
-				if (d[v] > d[u] + weight && d[v] != -1) {
+				if (d[v] > d[u] + weight) {
 					d[v] = d[u] + weight;
 					prev[v] = u;
 					q.push_back(v);
@@ -65,6 +65,11 @@ public:
 	Graph() = default;
 	~Graph() = default;
 	void print() const {
+		cout << "Vertices:" << endl;
+		for (auto v : graph) {
+			cout << v.first << " ";
+		}
+		cout << endl << "Edges:" << endl;
 		for (const auto& v : graph) {
 			for (const auto& e : v.second) {
 				cout << e;
@@ -86,17 +91,17 @@ public:
 	bool remove_vertex(const Vertex& v) {
 		return graph.erase(v);
 	}
-	vector<Vertex> vertices() const {
-		vector<Vertex> vec;
+	const vector<std::shared_ptr<Vertex>> vertices() const {
+		vector<shared_ptr<Vertex>> vec;
 		for (auto i : graph) {
-			vec.push_back(i.first);
+			vec.push_back(std::make_shared<Vertex>(i.first));
 		}
 		return vec;
 	}
 
 	void add_edge(const Vertex& from, const Vertex& to, const Distance& d) {
 		if (has_vertex(from) && has_vertex(to)) {
-			graph[from].push_back(Edge(from, to, d));
+			graph.at(from).push_back(Edge(from, to, d));
 		}
 		else {
 			throw invalid_argument("Vertex is not exist");
@@ -128,76 +133,64 @@ public:
 	}
 	bool has_edge(const Vertex& from, const Vertex& to) const {
 		auto iter = graph.find(from);
-		if (iter != graph.end()) {
-			for (auto iter_e = (*iter).second.begin(); iter_e != (*iter).second.end(); ++iter_e) {
-				if ((*iter_e).to == to) {
-					return true;
-				}
+		if (iter == graph.end()) {
+			return false;
+		}
+		auto list = (*iter).second;
+		for (auto iter_e = list.begin(); iter_e != list.end(); ++iter_e) {
+			if ((*iter_e).to == to) {
+				return true;
 			}
 		}
 		return false;
 	}
 	bool has_edge(const Edge& edge) const {
 		auto iter = graph.find(edge.from);
-		if (iter != graph.end()) {
-			for (auto iter_e = (*iter).second.begin(); iter_e != (*iter).second.end(); ++iter_e) {
-				if ((*iter_e) == edge) {
-					return true;
-				}
+		if (iter == graph.end()) {
+			return false;
+		}
+		auto list = (*iter).second;
+		for (auto iter_e = list.begin(); iter_e != list.end(); ++iter_e) {
+			if ((*iter_e) == edge) {
+				return true;
 			}
 		}
 		return false;
 	}
-	vector<Edge> edges() const {
-		vector<Edge> edges;
-		for (auto i : graph) {
-			for (auto j : i.second) {
-				edges.push_back(j);
-			}
-		}
-		return edges;
+	const list<Edge>& edges(const Vertex& from) const {
+		return graph.at(from);
 	}
 
 	size_t order() const {
 		return graph.size();
 	}
-	size_t degree(const Vertex& v) {
-		if (has_vertex(v)) {
-			return graph[v].size();
-		}
-		throw invalid_argument("Vertex is not exists");
+	size_t degree(const Vertex& v) const {
+		return graph.at(v).size();
 	}
 
-	void walk(const Vertex& start_vertex, function<void(const Vertex&)> action) {
+	void walk(const Vertex& start_vertex, function<void(const Vertex&)> action) const {
 		queue<Vertex> q;
 		auto visited = unordered_map<Vertex, float>();
 		q.push(start_vertex);
-		//action(start_vertex);
+		action(start_vertex);
 		visited[start_vertex] = 0;
 		while (!q.empty()) {
 			auto u = q.front();
 			q.pop();
-			for (auto e : graph[u]) {
+			for (auto e : graph.at(u)) {
 				auto v = e.to;
 				if (visited[v] == 0) {
 					visited[v] = visited[u] + 1;
 					q.push(v);
-					//action(v);
+					action(v);
 				}
 			}
-		}
-		for (auto v : visited) {
-			cout << v.first << ':' << v.second << endl;
-			//action(v.first);
 		}
 	}
 
 	vector<Vertex> shortest_path(const Vertex& from, const Vertex& to) {
 		auto prev = dijkstra(from).second;
 		vector<Vertex> path;
-		if (prev[to] == -1) {
-			return path;
-		}
 		path.push_back(to);
 		for (auto v = prev[to]; v != from; v = prev[v]) {
 			path.push_back(v);
@@ -207,7 +200,7 @@ public:
 		return path;
 	}
 
-	Distance eccentricity(const Vertex& v) {
+	const Distance& eccentricity(const Vertex& v) const {
 		Distance max_dist = 0;
 		auto d = dijkstra(v).first;
 		for (auto dist_v : d) {
@@ -218,17 +211,37 @@ public:
 		return max_dist;
 	}
 
-	vector<Vertex> center() {
+	vector<Vertex> center() const {
 		vector<Vertex> center;
 		Distance min_e = NULL;
 		for (auto v : vertices()) {
-			auto ecc_v = eccentricity(v);
+			auto ecc_v = eccentricity(*v);
 			if (min_e == NULL || ecc_v <= min_e) {
 				if (ecc_v < min_e) {
 					center.clear();
 				}
 				min_e = ecc_v;
-				center.push_back(v);
+				center.push_back(*v);
+			}
+		}
+		return center;
+	}
+
+	vector<Vertex> best_place() const {
+		vector<Vertex> center;
+		Distance min_sum = NULL;
+		for (auto v : vertices()) {
+			auto d = dijkstra(*v).first;
+			Distance summa = 0;
+			for (auto d_v : d) {
+				summa += d_v.second;
+			}
+			if (min_sum == NULL || summa <= min_sum) {
+				if (summa < min_sum) {
+					center.clear();
+				}
+				min_sum = summa;
+				center.push_back(*v);
 			}
 		}
 		return center;
