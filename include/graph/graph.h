@@ -89,6 +89,17 @@ public:
 		}
 	}
 	bool remove_vertex(const Vertex& v) {
+		for (auto i : graph) {
+			auto list = i.second;
+			for (auto iter_e = list.begin(); iter_e != list.end();) {
+				if ((*iter_e).to == v) {
+					iter_e = list.erase(iter_e);
+				}
+				else{
+					++iter_e;
+				}
+			}
+		}
 		return graph.erase(v);
 	}
 	const vector<std::shared_ptr<Vertex>> vertices() const {
@@ -168,7 +179,7 @@ public:
 		return graph.at(v).size();
 	}
 
-	void walk(const Vertex& start_vertex, function<void(const Vertex&)> action) const {
+	vector<Vertex> walk(const Vertex& start_vertex, function<void(const Vertex&)> action) const {
 		queue<Vertex> q;
 		auto visited = unordered_map<Vertex, float>();
 		q.push(start_vertex);
@@ -186,6 +197,13 @@ public:
 				}
 			}
 		}
+		auto vertices = vector<Vertex>();
+		for (auto i : visited) {
+			if (i.second > 0 || i.first == start_vertex) {
+				vertices.push_back(i.first);
+			}
+		}
+		return vertices;
 	}
 
 	vector<Vertex> shortest_path(const Vertex& from, const Vertex& to) {
